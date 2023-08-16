@@ -10,7 +10,14 @@ using namespace std;
 void CursorPosition(short x, short y) {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);  
     COORD position = {(short)x, (short)y};  
-  
+
+    // Blinking cursor is annoying!!!
+    // Make the cursor invisible
+    CONSOLE_CURSOR_INFO cursorInfo;
+    cursorInfo.dwSize = 100;
+    cursorInfo.bVisible = false;
+    SetConsoleCursorInfo(hStdout, &cursorInfo);
+
     SetConsoleCursorPosition(hStdout, position); 
 } 
 
