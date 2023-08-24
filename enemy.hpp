@@ -40,7 +40,6 @@ void next_enemy_position() {
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
-            // cout << " " << distance_a << " " << distance_b << " " << distance_c << " " << distance_d;
             break;
         case Downward:
             // Move Downward
@@ -101,7 +100,6 @@ void check_enemy_state() {
     for(int i = 1; i < 4; i++) {
         if(smallest_num[0] > smallest_num[i])
             smallest_num[0] = smallest_num[i];
-        // cout << smallest_num[0];
     }
 
     if(smallest_num[0] == distance_a) {
@@ -125,24 +123,28 @@ void draw_enemy_position() {
             delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x, enemy.y - 1);
             cout << "E";
+            enemy.old_y = enemy.y;
             enemy.y--;
             break;
         case Downward:
             delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x, enemy.y + 1);
             cout << "E";
+            enemy.old_y = enemy.y;
             enemy.y++;
             break;
         case Left:
             delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x - 1, enemy.y);
             cout << "E";
+            enemy.old_x = enemy.x;
             enemy.x--;
             break;
         case Right:
             delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x + 1, enemy.y);
             cout << "E";
+            enemy.old_x = enemy.x;
             enemy.x++;
             break;
     }

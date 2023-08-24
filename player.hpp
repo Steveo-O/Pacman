@@ -13,15 +13,19 @@ using namespace std;
 void check_direction() {
     if(GetAsyncKeyState(VK_UP) & 0x1) {
         state = DIRECTION::Upward;
+        start = true;
     }
     else if(GetAsyncKeyState(VK_DOWN) & 0x1) {
         state = DIRECTION::Downward;
+        start = true;
     }
     else if(GetAsyncKeyState(VK_LEFT) & 0x1) {
         state = DIRECTION::Left;
+        start = true;
     }
     else if(GetAsyncKeyState(VK_RIGHT) & 0x1) {
         state = DIRECTION::Right;
+        start = true;
     }
 }
 
