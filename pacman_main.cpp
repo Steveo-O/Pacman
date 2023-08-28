@@ -12,6 +12,7 @@ using namespace std;
 
 int main() {
     int i = 0;
+    cover();
     ShowMap();
     enemy.x = 19;
     enemy.y = 9;

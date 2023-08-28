@@ -40,3 +40,49 @@ void check_game_condition() {
     if(distance == 0) 
         pacman.status = GAMESTATE::lose;
 }
+
+void cover() {
+    int x, y;
+    x = 45;
+    y = 8;
+    cout <<
+    "#######        #           #######     ###     ###          #         #       #\n" <<
+    "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
+    "#      #     #   #       #             #   # #   #        #   #       #  #    #\n" <<
+    "######      #     #     #              #    #    #       #     #      #   #   #\n" <<
+    "#          # ##### #     #             #         #      # ##### #     #    #  #\n" <<
+    "#         #         #     #            #         #     #         #    #     # #\n" <<
+    "#        #           #     #######     #         #    #           #   #       #\n";
+    CursorPosition(x, y);
+    cout << "start\n";
+    cout << endl;
+    CursorPosition(x, y + 2);
+    cout << "quit";
+    CursorPosition(x - 1, y);
+    cout << "<";
+    while(1) {
+
+        if(GetAsyncKeyState(VK_DOWN) && y + 2 < 11) {
+            delete_old_position(x - 1, y);
+            y = y + 2;
+        }
+        if(GetAsyncKeyState(VK_UP) && y - 2 > 7) {
+            delete_old_position(x - 1, y);
+            y = y - 2;
+        }
+        CursorPosition(x - 1, y);
+        cout << ">";
+        if(GetAsyncKeyState(VK_RETURN)) {
+            switch(y) {
+                case 8:
+                    system("CLS");
+                    break;
+                case 10:
+                    system("Pause");
+                    exit(0);
+                    break;
+            }
+            break;
+        }
+    }
+}
