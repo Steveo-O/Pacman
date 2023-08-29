@@ -15,13 +15,13 @@ using namespace std;
 
 char tmp_map[20][40] = {
     "+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+",
-    "|                                     |",
-    "|                                     |",
-    "|          $              $           |",
-    "|          $              $           |",
-    "|          $              $           |",
-    "|        $$$              $$$         |",
-    "|                                     |",
+    "|             $$$$$$$$$$$             |",
+    "| $ $$$$$$$ $           $ $ $$$$$$$ $ |",
+    "| $       $ $ $$$$$$$$$ $ $       $ $ |",
+    "| $ $       $             $ $       $ |",
+    "| $ $$$$$$$ $ $$$$$$$$$$$ $ $$$$$$$ $ |",
+    "| $         $                       $ |",
+    "|              $$$$ $$$$              |",
     "|                  X                  |",
     "|               |     |               |",
     "|               |$$$$$|               |",
@@ -66,13 +66,16 @@ void ShowMap()
     for(int y = 0; y < 20; y++) 
     {
         for(int x = 0; x < 80; x++) {
-            cout << map[y][x];
-
             // find where the initial player position
             if(map[y][x] == 'X') {
                 player.x = x;
                 player.y = y;
             }
+            else if (map[y][x] == ' ') {
+                // Add a dot to empty spaces
+                map[y][x] = '.';
+            }
+            cout << map[y][x];
         }
         cout << endl;
     }  

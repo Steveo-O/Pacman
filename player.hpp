@@ -29,6 +29,13 @@ void check_direction() {
     }
 }
 
+void check_consume_dot(short x, short y) {
+    if(map[y][x] == '.') {
+        map[y][x] = ' ';  // Remove the dot
+        score++;  // Increment the score
+    }
+}
+
 void draw_player_position() {
     switch(state) {
         case Upward:
@@ -56,7 +63,7 @@ void draw_player_position() {
             cout << "X";
             break;
     }
-    
+    check_consume_dot(player.x, player.y);
 }
 
 // From the given direction state, change the player position according to the direction state

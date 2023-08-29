@@ -31,6 +31,17 @@ bool check_obstacles(short x, short y) {
     return map[y][x] == '$' || map[y][x] == '|';
 }
 
+void InitializeTotalDots() {
+    // Count the initial number of dots
+    for (int row = 0; row < 20; row++) {
+        for (int column = 0; column < 80; column++) {
+            if (map[row][column] == '.') {
+                totalDots++;
+            }
+        }
+    }
+}
+
 void check_game_condition() { 
     int distance, distance_x, distance_y;
     distance_x = player.x - enemy.x;
@@ -39,11 +50,13 @@ void check_game_condition() {
     
     if(distance == 0) 
         pacman.status = GAMESTATE::lose;
+    else if(score >= totalDots)
+        pacman.status = GAMESTATE::win;
 }
 
 void cover() {
     int x, y;
-    x = 45;
+    x = 40;
     y = 8;
     cout <<
     "#######        #           #######     ###     ###          #         #       #\n" <<

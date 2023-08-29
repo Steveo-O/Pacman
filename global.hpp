@@ -32,3 +32,5 @@ struct PACMAN{
 float distance_a, distance_b, distance_c, distance_d;
 float result_x, result_y;
 bool start = false;
+int score = 0;
+int totalDots = 0;
