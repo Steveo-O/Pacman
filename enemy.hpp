@@ -118,34 +118,38 @@ void check_enemy_state() {
 
 void draw_enemy_position() {
     enemy_previous_state = enemy_state;
+    if(map[enemy.y][enemy.x] == '.') {
+        CursorPosition(enemy.x, enemy.y); 
+        cout << '.';
+    }
+    else
+        delete_old_position(enemy.x, enemy.y);
     switch(enemy_state) {
         case Upward:
-            delete_old_position(enemy.x, enemy.y);
+            
             CursorPosition(enemy.x, enemy.y - 1);
             cout << "E";
             enemy.old_y = enemy.y;
             enemy.y--;
             break;
         case Downward:
-            delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x, enemy.y + 1);
             cout << "E";
             enemy.old_y = enemy.y;
             enemy.y++;
             break;
         case Left:
-            delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x - 1, enemy.y);
             cout << "E";
             enemy.old_x = enemy.x;
             enemy.x--;
             break;
         case Right:
-            delete_old_position(enemy.x, enemy.y);
             CursorPosition(enemy.x + 1, enemy.y);
             cout << "E";
             enemy.old_x = enemy.x;
             enemy.x++;
             break;
     }
+    
 }
