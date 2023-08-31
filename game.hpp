@@ -28,16 +28,15 @@ void delete_old_position(short x, short y) {
 }
 
 bool check_obstacles(short x, short y) {
-    return map[y][x] == '$' || map[y][x] == '|';
+    return map[y][x] == '#' || map[y][x] == '|';
 }
 
 void InitializeTotalDots() {
     // Count the initial number of dots
     for (int row = 0; row < 20; row++) {
         for (int column = 0; column < 80; column++) {
-            if (map[row][column] == '.') {
+            if (map[row][column] == '.') 
                 totalDots++;
-            }
         }
     }
 }

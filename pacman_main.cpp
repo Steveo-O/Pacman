@@ -15,12 +15,11 @@ int main() {
     cover();
     ShowMap();
     InitializeTotalDots();
-    enemy.x = 19;
+    enemy.x = 39;
     enemy.y = 9;
     CursorPosition(enemy.x, enemy.y);
     cout << "E";
-    state = DIRECTION::Still;
-    enemy_previous_state = DIRECTION::Upward;
+    enemy_previous_state = DIRECTION::Upward; // Initiliaze enemy direction upward
     pacman.status = GAMESTATE::running;
     while(pacman.status == GAMESTATE::running) {
         check_direction();
@@ -33,6 +32,7 @@ int main() {
             next_enemy_position();
             check_enemy_state();
             draw_enemy_position();
+            check_reset_enemy();
         }
         check_game_condition();
         Sleep(100);
@@ -41,12 +41,12 @@ int main() {
     switch(pacman.status) {
         case lose:
             system("CLS");
-            cout << "You lose!" << "Total score: " << score << "\n";
+            cout << "You lose! " << "Total score: " << score << "\n";
             system("pause");
             break;
         case win:
             system("CLS");
-            cout << "You win!" << "Total score: " << score << "\n";
+            cout << "You win! " << "Total score: " << score << "\n";
             system("pause");
     }
 }
