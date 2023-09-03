@@ -2,6 +2,8 @@
 #include <iostream>
 #include <windows.h>
 #include <cmath>
+#include <chrono>
+#include <iomanip>
 #include "global.hpp"
 #include "map.hpp"
 
@@ -70,15 +72,13 @@ void cover() {
     cout << endl;
     CursorPosition(x, y + 2);
     cout << "quit";
-    CursorPosition(x - 1, y);
-    cout << "<";
     while(1) {
 
-        if(GetAsyncKeyState(VK_DOWN) && y + 2 < 11) {
+        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 11) {
             delete_old_position(x - 1, y);
             y = y + 2;
         }
-        if(GetAsyncKeyState(VK_UP) && y - 2 > 7) {
+        if(GetAsyncKeyState(VK_UP) & 0x1 && y - 2 > 7) {
             delete_old_position(x - 1, y);
             y = y - 2;
         }
@@ -90,11 +90,77 @@ void cover() {
                     system("CLS");
                     break;
                 case 10:
-                    system("Pause");
                     exit(0);
                     break;
             }
             break;
         }
     }
+}
+
+void check_map() {
+    int x, y;
+    x = 0;
+    y = 1;
+    cout << "Pls choose the map:\n";
+    cout << ">map1\n";
+    cout << endl;
+    for(int i = 2; i < 4; i++) {
+        cout << " map" << i << "\n";
+        cout << endl;
+    }
+    while(1) {
+
+        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 6) {
+            delete_old_position(x, y);
+            y = y + 2;
+        }
+        if(GetAsyncKeyState(VK_UP) & 0x1 && y - 2 > 0) {
+            delete_old_position(x, y);
+            y = y - 2;
+        }
+        CursorPosition(x, y);
+        cout << ">";
+        switch(y) {
+                case 1:
+                    map_num = 1;
+                    break;
+                case 3:
+                    map_num = 2;
+                    break;
+                case 5:
+                    map_num = 3;
+                    break;
+        }
+        CursorPosition(0, 6);
+        cout << endl;
+        PreviewMap();
+        if(GetAsyncKeyState(VK_RETURN)) {
+            switch(y) {
+                case 1:
+                    map_num = 1;
+                    break;
+                case 3:
+                    map_num = 2;
+                    break;
+                case 5:
+                    map_num = 3;
+                    break;
+            }
+            system("CLS");
+            break;
+        }
+    }
+
+}
+
+void count_time(auto start) {
+	auto finish = std::chrono::steady_clock::now();
+    auto diff = finish - start;
+    auto playtime = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+
+    hours = playtime / 3600;
+    minutes = (playtime % 3600) / 60;
+    seconds = playtime % 60;
+    cout << "Time: " << hours << ":" << minutes << ":" << seconds << endl;
 }

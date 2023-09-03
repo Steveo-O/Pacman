@@ -12,7 +12,14 @@ using namespace std;
 
 int main() {
     int i = 0;
+    // HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    // _SMALL_RECT rectWindow = {0, 0, 90, 20};
+    // SetConsoleWindowInfo(hConsole, TRUE, &rectWindow);
+    // SetConsoleScreenBufferSize(hConsole, {(short)100,(short)40});
+    // SetConsoleActiveScreenBuffer(hConsole);    
     cover();
+    check_map();
+    ReadMap();
     ShowMap();
     InitializeTotalDots();
     enemy.x = 39;
@@ -21,11 +28,14 @@ int main() {
     cout << "E";
     enemy_previous_state = DIRECTION::Upward; // Initiliaze enemy direction upward
     pacman.status = GAMESTATE::running;
+    auto time_start = std::chrono:: steady_clock::now();
     while(pacman.status == GAMESTATE::running) {
+        CursorPosition(81, 6);
+        count_time(time_start);
         check_direction();
         if(next_position()) {
             draw_player_position();
-            CursorPosition(85, 5);
+            CursorPosition(81, 5);
             cout << "score: " << score;          
         }
         if(i % 2 && start) {
@@ -41,12 +51,16 @@ int main() {
     switch(pacman.status) {
         case lose:
             system("CLS");
-            cout << "You lose! " << "Total score: " << score << "\n";
+            cout << "You lose!\n"; 
+            cout << "Total score: " << score << "\n";
+            cout << "Total used time: " << hours << ":" << minutes << ":" << seconds << endl;
             system("pause");
             break;
         case win:
             system("CLS");
-            cout << "You win! " << "Total score: " << score << "\n";
+            cout << "You lose!\n"; 
+            cout << "Total score: " << score << "\n";
+            cout << "Total used time: " << hours << ":" << minutes << ":" << seconds << endl;
             system("pause");
     }
 }

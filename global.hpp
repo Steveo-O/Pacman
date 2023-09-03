@@ -34,3 +34,4 @@ float result_x, result_y;
 bool start = false;
 int score = 0;
 int totalDots = 0;
+int map_num, hours, minutes, seconds;
