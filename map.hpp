@@ -1,131 +1,93 @@
 #pragma once
 #include <iostream>
+#include <fstream>
 #include <windows.h>
+#include <string>
+#include <vector>
 
 #include "global.hpp"
 
 
-/*
-a = aa
-    aa
-
-*/
 
 using namespace std;
 
-char map1[20][40] = {
-    "+#####################################+",
-    "|             ###########             |",
-    "| # ####### #           # # ####### # |",
-    "| #       # # ######### # #       # # |",
-    "| # #       #             # #       # |",
-    "| # ####### # ########### # ####### # |",
-    "| #         #             #         # |",
-    "|              #### ####            # |",
-    "|  # ###### #      X      # ###### ## |",
-    "| #    #     #  |     | #    #     ## |",
-    "| #  #   #   #  |#####| #  #   #   ## |",
-    "|  # ###### #             # ###### ## |",
-    "|     #   #    #### ####    #   #     |",
-    "| #     #   #             #   #     # |",
-    "| # ####### # ########### # ####### # |",
-    "| # #       #             # #       # |",
-    "| #       # # ######### # #       # # |",
-    "| # ####### #           # # ####### # |",
-    "|             ###########             |",
-    "+#####################################+"};
+char map[40][80];
+char* appdata = getenv("APPDATA");
+string map_folder = "\\pacman_game";
+string map_path = appdata + map_folder;
+string search_pattern = "\\*.map";
+string search_path = map_path + search_pattern;
 
-char map2[20][40] = {
-    "+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|     !!!!!       !        !!!!!      |",
-    "|                 !                   |",
-    "|                !!!                  |",
-    "|           !!!!!!!!!!!!!             |",
-    "|                !!!                  |",
-    "|                 !                   |",
-    "|                 !                   |",
-    "|     !!!!!                !!!!!      |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "|         !                !          |",
-    "+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+"};
+vector<string> find_all_maps() {
+    // Create directory if necessary
+    if (CreateDirectory(map_path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
+        vector<string> maps;
+        WIN32_FIND_DATA fd;
 
-char map3[20][40] = {
-    "+#####################################+",
-    "|             ###########             |",
-    "| # ####### #           # # ####### # |",
-    "| #       # # ######### # #       # # |",
-    "| # #       #             # #       # |",
-    "| # ####### # ########### # ####### # |",
-    "| #         #             #         # |",
-    "|              #### ####            # |",
-    "|  # ####### #     X      # ###### ## |",
-    "| #    #   # #  |     | #    #     ## |",
-    "| #  #   #   #  |#####| #  #   #   ## |",
-    "|  # ####### #            # ###### ## |",
-    "|     #   #    #### ####    #   #     |",
-    "| #     #   #             #   #     # |",
-    "| # ####### # ########### # ####### # |",
-    "| # #       #             # #       # |",
-    "| #       # # ######### # #       # # |",
-    "| # ####### #           # # ####### # |",
-    "|             ###########             |",
-    "+#####################################+"};
-
-char tmp_map[20][40]; 
-char map[20][80];
+        // Try to find the file by pattern (`search_pattern`)
+        // All .map file extension will be matched (*.map)
+        HANDLE hFind = FindFirstFile(search_path.c_str(), &fd);
+        if (hFind != INVALID_HANDLE_VALUE) {
+            do {
+                // Only append those result that are files
+                // Meaning exclude . and .. directory
+                if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+                    maps.push_back(fd.cFileName);
+                }
+            } while (FindNextFile(hFind, &fd));
+            FindClose(hFind);
+        }
+        return maps;
+    }
+    exit(1); // TODO: handle the error nicely
+}
 
 void ReadMap() {
-    int first, second;
-
-    for(int y = 0; y < 20; y++) {
-        for(int x = 0; x < 40; x++) {
-            switch(map_num) {
-                case 1:
-                    tmp_map[y][x] = map1[y][x];
-                    break;
-                case 2:
-                    tmp_map[y][x] = map2[y][x];
-                    break;
-                case 3:
-                    tmp_map[y][x] = map3[y][x];
-                    break;
-            }
+    char ch;
+    fstream fin(map_path + "//" + map_choice, fstream::in);
+    int row = 0;
+    int col = 0;
+    while(fin >> noskipws >> ch) {
+        // newline indicates a new row
+        // update the col and row but don't do anything
+        if (ch == '\n') {
+            row += 1;
+            col = 0;
+            continue;
         }
-    }
-    for (int row = 0; row < 20; row++)  
-    {  
-        first = -1;
-        second = 0;
-        for(int column = 0; column < 40; column++ ) {
-            
-            for(int i = 0; i < 2; i++ ) {
-                if(i == 0) {
-                    first++;
-                    map[row][column + first] = tmp_map[row][column];
-
-                }
-                else {
-                    second++;
-                    map[row][column + second] = tmp_map[row][column];
-
-                }
-            }
-
+        // replace empty space with dot
+        if (ch == ' ') {
+            ch = '.';
         }
+
+        /* Expand the map to the following format
+            |x|x|   --->   |x|#|x|#|
+            -----          ---------
+            |x|x|          |#|#|#|#|
+                           ---------
+                           |x|#|x|#|
+                           ---------
+                           |#|#|#|#|
+            where the int x and int y refers to
+            `x` coordinate.
+
+            And we fill up the neighbour
+            (horizontal, vertical and diagonal) with the `ch`.
+        */
+        int x = col * 2;
+        int y = row * 2;
+        map[y][x] = ch;
+        map[y + 1][x + 1] = ch;
+        map[y + 1][x] = ch;
+        map[y][x + 1] = ch;
+
+        col += 1;
     }
 }
 
 void ShowMap()  
-{  
-    for(int y = 0; y < 20; y++) 
+{
+    for(int y = 0; y < 40; y++) 
     {
         for(int x = 0; x < 80; x++) {
             // find where the initial player position
@@ -133,33 +95,22 @@ void ShowMap()
                 player.x = x;
                 player.y = y;
             }
-            else if (map[y][x] == ' ') {
-                // Add a dot to empty spaces
-                map[y][x] = '.';
-            }
             cout << map[y][x];
         }
         cout << endl;
-    }  
-}  
+    }
+}
 
 void PreviewMap() 
 {
-    for(int y = 0; y < 20; y++) {
-        for(int x = 0; x < 40; x++) {
-            switch(map_num) {
-                case 1:
-                    cout << map1[y][x];
-                    break;
-                case 2:
-                    cout << map2[y][x];
-                    break;
-                case 3:
-                    cout << map3[y][x];
-                    break;
-            }
-        }
-        cout << endl;
+    string line;
+    fstream fin(map_path + "//" + map_choice, fstream::in);
+    while(getline(fin, line)) {
+        cout << line << endl;
     }
-    
+    cout << endl;
+}
+
+string editor_command(string map_name) {
+     return "notepad \"" + map_path + "\\" + map_name + "\"";
 }
