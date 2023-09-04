@@ -48,3 +48,4 @@ std::vector<Player> players;
 std::vector<Player> sorted_players;
 
 std::string name;
+std::string map_choice;

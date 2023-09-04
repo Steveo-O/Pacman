@@ -16,10 +16,17 @@ int main() {
     // _SMALL_RECT rectWindow = {0, 0, 90, 20};
     // SetConsoleWindowInfo(hConsole, TRUE, &rectWindow);
     // SetConsoleScreenBufferSize(hConsole, {(short)100,(short)40});
-    // SetConsoleActiveScreenBuffer(hConsole);    
-    cover();
-    check_map();
+    // SetConsoleActiveScreenBuffer(hConsole);
+    main_menu();
     ReadMap();
+
+    // This is to mitigate GetAsyncKeyState scanned
+    // previous input key
+    CursorPosition(20, 20);
+    cout << "Press any key to start"<< endl;
+    while(!kbhit()) {}
+    CursorPosition(0, 0);
+
     ShowMap();
     InitializeTotalDots();
     enemy.x = 39;
@@ -36,7 +43,7 @@ int main() {
         if(next_position()) {
             draw_player_position();
             CursorPosition(81, 5);
-            cout << "score: " << score;          
+            cout << "score: " << score;
         }
         if(i % 2 && start) {
             next_enemy_position();
