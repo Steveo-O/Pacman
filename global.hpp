@@ -4,6 +4,7 @@
 */
 #pragma once
 #include <string>
+#include <chrono>
 
 enum GAMESTATE {
     running = 0,
@@ -14,6 +15,13 @@ enum DIRECTION {
     Still = 0,
     Upward, Downward, Left, Right
 }state, enemy_state, enemy_previous_state;
+
+// Reference: https://www.ascii-code.com/CP437
+enum MAP {
+    Dot = 176u, // Middle dot
+    Enemy = 239u, // Intersection
+    Wall = 219u, // Full block
+};
 
 /*
     To access the member of struct
@@ -38,3 +46,4 @@ int score = 0;
 int totalDots = 0;
 int hours, minutes, seconds;
 std::string map_choice;
+std::chrono::time_point<std::chrono::steady_clock> time_start;

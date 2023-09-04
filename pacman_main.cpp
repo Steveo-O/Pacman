@@ -18,27 +18,23 @@ int main() {
     // SetConsoleScreenBufferSize(hConsole, {(short)100,(short)40});
     // SetConsoleActiveScreenBuffer(hConsole);
     main_menu();
-    ReadMap();
 
     // This is to mitigate GetAsyncKeyState scanned
     // previous input key
     CursorPosition(20, 20);
     cout << "Press any key to start"<< endl;
     while(!kbhit()) {}
-    CursorPosition(0, 0);
 
-    ShowMap();
+    CursorPosition(0, 0);
+    InitMap();
+
     InitializeTotalDots();
-    enemy.x = 39;
-    enemy.y = 9;
-    CursorPosition(enemy.x, enemy.y);
-    cout << "E";
     enemy_previous_state = DIRECTION::Upward; // Initiliaze enemy direction upward
     pacman.status = GAMESTATE::running;
-    auto time_start = std::chrono:: steady_clock::now();
+    time_start = std::chrono:: steady_clock::now();
     while(pacman.status == GAMESTATE::running) {
         CursorPosition(81, 6);
-        count_time(time_start);
+        count_time();
         check_direction();
         if(next_position()) {
             draw_player_position();
@@ -54,18 +50,18 @@ int main() {
         check_game_condition();
         Sleep(100);
         i++;
-    }  
+    } 
     switch(pacman.status) {
         case lose:
             system("CLS");
-            cout << "You lose!\n"; 
+            cout << "You lose!\n";
             cout << "Total score: " << score << "\n";
             cout << "Total used time: " << hours << ":" << minutes << ":" << seconds << endl;
             system("pause");
             break;
         case win:
             system("CLS");
-            cout << "You lose!\n"; 
+            cout << "You lose!\n";
             cout << "Total score: " << score << "\n";
             cout << "Total used time: " << hours << ":" << minutes << ":" << seconds << endl;
             system("pause");

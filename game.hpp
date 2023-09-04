@@ -35,19 +35,25 @@ void CursorPosition(short x, short y) {
 } 
 
 void delete_old_position(short x, short y) {
-        CursorPosition(x, y);
-        cout << " ";
+    CursorPosition(x, y);
+    cout << ' ';
+    CursorPosition(x + 1, y);
+    cout << ' ';
+    CursorPosition(x, y + 1);
+    cout << ' ';
+    CursorPosition(x + 1, y + 1);
+    cout << ' ';
 }
 
 bool check_obstacles(short x, short y) {
-    return map[y][x] == '-' || map[y][x] == '|';
+    return map[y][x] == (char)MAP::Wall;
 }
 
 void InitializeTotalDots() {
     // Count the initial number of dots
-    for (int row = 0; row < 40; row++) {
-        for (int column = 0; column < 80; column++) {
-            if (map[row][column] == '.') 
+    for (int row = 0; row < 40; row += 2) {
+        for (int column = 0; column < 80; column += 2) {
+            if (map[row][column] == (char)MAP::Dot)
                 totalDots++;
         }
     }
@@ -94,13 +100,15 @@ void main_menu() {
         switch(ch) {
             case key_up:
                 if (y - 2 > 7) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < 13) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -148,13 +156,15 @@ void choose_map(string message) {
         switch(ch) {
             case key_up:
                 if (y - 2 > 0) {
-                    delete_old_position(x, y);
+                    CursorPosition(x, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < max_list) {
-                    delete_old_position(x, y);
+                    CursorPosition(x, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -194,13 +204,15 @@ void map_screen() {
         switch(ch) {
             case key_up:
                 if (y - 2 > 7) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < 13) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -254,9 +266,9 @@ void map_screen() {
     }
 }
 
-void count_time(auto start) {
+void count_time() {
 	auto finish = std::chrono::steady_clock::now();
-    auto diff = finish - start;
+    auto diff = finish - time_start;
     auto playtime = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
 
     hours = playtime / 3600;

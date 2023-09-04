@@ -30,8 +30,8 @@ void check_direction() {
 }
 
 void check_consume_dot(short x, short y) {
-    if(map[y][x] == '.') {
-        map[y][x] = ' ';  // Remove the dot
+    if(map[y][x] == (char)MAP::Dot) {
+        map[y][x] = ' ';
         score++;  // Increment the score
     }
 }
@@ -39,28 +39,46 @@ void check_consume_dot(short x, short y) {
 void draw_player_position() {
     switch(state) {
         case Upward:
-            delete_old_position(player.x, player.y + 1); 
             CursorPosition(player.x, player.y);
-            cout << "^";
+            cout << '/';
+            CursorPosition(player.x + 1, player.y);
+            cout << '\\';
+            CursorPosition(player.x, player.y + 1);
+            cout << ' ';
+            CursorPosition(player.x + 1, player.y + 1);
+            cout << ' ';
             break;
         case Downward:
-            delete_old_position(player.x, player.y - 1);
             CursorPosition(player.x, player.y);
-            cout << "v";
+            cout << ' ';
+            CursorPosition(player.x + 1, player.y);
+            cout << ' ';
+            CursorPosition(player.x, player.y + 1);
+            cout << '\\';
+            CursorPosition(player.x + 1, player.y + 1);
+            cout << '/';
             break;
         case Left:
-            delete_old_position(player.x + 1, player.y);
             CursorPosition(player.x, player.y);
-            cout << "<";
+            cout << '/';
+            CursorPosition(player.x + 1, player.y);
+            cout << ' ';
+            CursorPosition(player.x, player.y + 1);
+            cout << '\\';
+            CursorPosition(player.x + 1, player.y + 1);
+            cout << ' ';
             break;
         case Right:
-            delete_old_position(player.x - 1, player.y);
             CursorPosition(player.x, player.y);
-            cout << ">";
+            cout << ' ';
+            CursorPosition(player.x + 1, player.y);
+            cout << '\\';
+            CursorPosition(player.x, player.y + 1);
+            cout << ' ';
+            CursorPosition(player.x + 1, player.y + 1);
+            cout << '/';
             break;
         case Still:
-            CursorPosition(player.x, player.y);
-            cout << "X";
             break;
     }
     check_consume_dot(player.x, player.y);
@@ -70,26 +88,30 @@ void draw_player_position() {
 bool next_position() {
     switch(state) {
         case Upward:
-            if (!check_obstacles(player.x, player.y - 1)){
-                player.y--;
+            if (!check_obstacles(player.x, player.y - 2)){
+                delete_old_position(player.x, player.y);
+                player.y -= 2;
                 return true;
             }
             break;
         case Downward:
-            if (!check_obstacles(player.x, player.y + 1)){
-                player.y++;
+            if (!check_obstacles(player.x, player.y + 2)){
+                delete_old_position(player.x, player.y);
+                player.y += 2;
                 return true;
             }
             break;
         case Left:
-            if (!check_obstacles(player.x - 1, player.y)){
-                player.x--;
+            if (!check_obstacles(player.x - 2, player.y)){
+                delete_old_position(player.x, player.y);
+                player.x -= 2;
                 return true;
             }
             break;
         case Right:
-            if (!check_obstacles(player.x + 1, player.y)){
-                player.x++;
+            if (!check_obstacles(player.x + 2, player.y)){
+                delete_old_position(player.x, player.y);
+                player.x += 2;
                 return true;
             }
             break;
