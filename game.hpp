@@ -9,6 +9,16 @@
 
 using namespace std;
 
+void choose_map(string);
+void main_menu();
+void map_screen();
+
+const int key_up = 72;
+const int key_down = 80;
+const int key_left = 75;
+const int key_right = 77;
+const int key_enter = 13;
+
 // Move the Cursor to the given position
 void CursorPosition(short x, short y) {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);  
@@ -30,12 +40,12 @@ void delete_old_position(short x, short y) {
 }
 
 bool check_obstacles(short x, short y) {
-    return map[y][x] == '#' || map[y][x] == '|';
+    return map[y][x] == '-' || map[y][x] == '|';
 }
 
 void InitializeTotalDots() {
     // Count the initial number of dots
-    for (int row = 0; row < 20; row++) {
+    for (int row = 0; row < 40; row++) {
         for (int column = 0; column < 80; column++) {
             if (map[row][column] == '.') 
                 totalDots++;
@@ -48,110 +58,200 @@ void check_game_condition() {
     distance_x = player.x - enemy.x;
     distance_y = player.y - enemy.y;
     distance = sqrt(distance_x * distance_x + distance_y * distance_y);
-    
+
     if(distance == 0) 
         pacman.status = GAMESTATE::lose;
     else if(score >= totalDots)
         pacman.status = GAMESTATE::win;
 }
 
-void cover() {
+void main_menu() {
     int x, y;
     x = 40;
     y = 8;
+    CursorPosition(0, 0);
     cout <<
-    "#######        #           #######     ###     ###          #         #       #\n" <<
+    "#######        #           #######     ###     ###          #         ##      #\n" <<
     "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
-    "#      #     #   #       #             #   # #   #        #   #       #  #    #\n" <<
+    "#      #     #   #      #              #   # #   #        #   #       #  #    #\n" <<
     "######      #     #     #              #    #    #       #     #      #   #   #\n" <<
-    "#          # ##### #     #             #         #      # ##### #     #    #  #\n" <<
+    "#          # ##### #    #              #         #      # ##### #     #    #  #\n" <<
     "#         #         #     #            #         #     #         #    #     # #\n" <<
-    "#        #           #     #######     #         #    #           #   #       #\n";
+    "#        #           #     #######     #         #    #           #   #      ##\n";
     CursorPosition(x, y);
-    cout << "start\n";
+    cout << "start" << endl;
     cout << endl;
     CursorPosition(x, y + 2);
+    cout << "map editor" << endl;
+    cout << endl;
+    CursorPosition(x, y + 4);
     cout << "quit";
     while(1) {
-
-        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 11) {
-            delete_old_position(x - 1, y);
-            y = y + 2;
-        }
-        if(GetAsyncKeyState(VK_UP) & 0x1 && y - 2 > 7) {
-            delete_old_position(x - 1, y);
-            y = y - 2;
-        }
         CursorPosition(x - 1, y);
         cout << ">";
-        if(GetAsyncKeyState(VK_RETURN)) {
-            switch(y) {
-                case 8:
-                    system("CLS");
-                    break;
-                case 10:
-                    exit(0);
-                    break;
-            }
-            break;
+        while(!kbhit()) {}
+        int const ch = getch();
+        switch(ch) {
+            case key_up:
+                if (y - 2 > 7) {
+                    delete_old_position(x - 1, y);
+                    y -= 2;
+                }
+                break;
+            case key_down:
+                if (y + 2 < 13) {
+                    delete_old_position(x - 1, y);
+                    y += 2;
+                }
+                break;
+            case key_enter:
+                switch(y) {
+                    case 8:
+                        choose_map("Please select a map: ");
+                        break;
+                    case 10:
+                        system("CLS");
+                        map_screen();
+                        break;
+                    case 12:
+                        exit(0);
+                        break;
+                }
+                return;
         }
     }
 }
 
-void check_map() {
-    int x, y;
-    x = 0;
-    y = 1;
-    cout << "Pls choose the map:\n";
-    cout << ">map1\n";
-    cout << endl;
-    for(int i = 2; i < 4; i++) {
-        cout << " map" << i << "\n";
-        cout << endl;
-    }
-    while(1) {
+void choose_map(string message) {
+    int x = 0;
+    int y = 1;
+    system("CLS");
 
-        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 6) {
-            delete_old_position(x, y);
-            y = y + 2;
-        }
-        if(GetAsyncKeyState(VK_UP) & 0x1 && y - 2 > 0) {
-            delete_old_position(x, y);
-            y = y - 2;
-        }
+    vector<string> maps = find_all_maps();
+    int max_list = maps.size() * 2;
+    cout << message << endl;
+    for (string map: maps) {
+        cout << " " << map << endl << endl;
+    }
+
+    while(1) {
         CursorPosition(x, y);
         cout << ">";
-        switch(y) {
-                case 1:
-                    map_num = 1;
-                    break;
-                case 3:
-                    map_num = 2;
-                    break;
-                case 5:
-                    map_num = 3;
-                    break;
-        }
-        CursorPosition(0, 6);
+        map_choice = maps[y / 2];
+
+        CursorPosition(0, max_list);
         cout << endl;
         PreviewMap();
-        if(GetAsyncKeyState(VK_RETURN)) {
-            switch(y) {
-                case 1:
-                    map_num = 1;
-                    break;
-                case 3:
-                    map_num = 2;
-                    break;
-                case 5:
-                    map_num = 3;
-                    break;
-            }
-            system("CLS");
-            break;
+
+        while(!kbhit()){}
+        int const ch = getch();
+        switch(ch) {
+            case key_up:
+                if (y - 2 > 0) {
+                    delete_old_position(x, y);
+                    y -= 2;
+                }
+                break;
+            case key_down:
+                if (y + 2 < max_list) {
+                    delete_old_position(x, y);
+                    y += 2;
+                }
+                break;
+            case key_enter:
+                system("CLS");
+                return;
         }
     }
+}
 
+void map_screen() {
+    int x = 40;
+    int y = 8;
+    string command;
+
+    cout <<
+    "#######        #           #######     ###     ###          #         ##      #\n" <<
+    "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
+    "#      #     #   #      #              #   # #   #        #   #       #  #    #\n" <<
+    "######      #     #     #              #    #    #       #     #      #   #   #\n" <<
+    "#          # ##### #    #              #         #      # ##### #     #    #  #\n" <<
+    "#         #         #     #            #         #     #         #    #     # #\n" <<
+    "#        #           #     #######     #         #    #           #   #      ##\n";
+
+    CursorPosition(x, y);
+    cout << "new map" << endl << endl;
+    CursorPosition(x, y + 2);
+    cout << "edit map" << endl << endl;
+    CursorPosition(x, y + 4);
+    cout << "return to main menu";
+
+    while(1) {
+        CursorPosition(x - 1, y);
+        cout << ">";
+        while(!kbhit()) {}
+        int const ch = getch();
+        switch(ch) {
+            case key_up:
+                if (y - 2 > 7) {
+                    delete_old_position(x - 1, y);
+                    y -= 2;
+                }
+                break;
+            case key_down:
+                if (y + 2 < 13) {
+                    delete_old_position(x - 1, y);
+                    y += 2;
+                }
+                break;
+            case key_enter:
+                switch(y) {
+                    case 8:
+                        {
+                            char use_template;
+                            string res;
+                            while (1) {
+                                CursorPosition(x, y + 14);
+                                cout << "Use existing maps as template? [y/n]";
+                                use_template = _getch();
+                                if (tolower(use_template) != 'y' && tolower(use_template) != 'n') {
+                                    continue;
+                                }
+                                break;
+                            }
+                            cout << endl;
+                            CursorPosition(x, y + 15);
+                            cout << "Enter the new map name: ";
+                            cin >> res;
+
+                            // Copy existing map to new file (input)
+                            if (tolower(use_template) == 'y') {
+                                choose_map("Choose a map as template: ");
+                                CopyFile((map_path + "\\" + map_choice).c_str(), (map_path + "\\" + res + ".map").c_str(), true);
+                            }
+
+                            // Start notepad and wait for user to close it
+                            command = editor_command(res + ".map");
+                            system(command.c_str());
+
+                            main_menu();
+                            break;
+                        }
+                    case 10:
+                        choose_map("Choose a map to be edited: ");
+
+                        // Start notepad and wait for user to close it
+                        command = editor_command(map_choice);
+                        system(command.c_str());
+                        main_menu();
+                        break;
+                    case 12:
+                        system("CLS");
+                        return main_menu();
+                }
+                return;
+        }
+    }
 }
 
 void count_time(auto start) {

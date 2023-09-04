@@ -3,6 +3,8 @@
     'X' is player
 */
 #pragma once
+#include <string>
+
 enum GAMESTATE {
     running = 0,
     win, lose
@@ -34,4 +36,5 @@ float result_x, result_y;
 bool start = false;
 int score = 0;
 int totalDots = 0;
-int map_num, hours, minutes, seconds;
+int hours, minutes, seconds;
+std::string map_choice;
