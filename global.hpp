@@ -5,6 +5,7 @@
 #pragma once
 #include <string>
 #include <chrono>
+#include <vector>
 
 enum GAMESTATE {
     running = 0,
@@ -44,6 +45,17 @@ float result_x, result_y;
 bool start = false;
 int score = 0;
 int totalDots = 0;
-int hours, minutes, seconds;
+int map_num, hours, minutes, seconds;
+
+struct Player{
+    std::string player_name;
+    int highscore;
+    int duration;
+};
+
+std::vector<Player> players;
+std::vector<Player> sorted_players;
+
+std::string name;
 std::string map_choice;
 std::chrono::time_point<std::chrono::steady_clock> time_start;

@@ -3,7 +3,10 @@
 #include <windows.h>
 #include <cmath>
 #include <chrono>
-#include <iomanip>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <algorithm>
 #include "global.hpp"
 #include "map.hpp"
 
@@ -71,11 +74,90 @@ void check_game_condition() {
         pacman.status = GAMESTATE::win;
 }
 
-void main_menu() {
-    int x, y;
-    x = 40;
-    y = 8;
-    CursorPosition(0, 0);
+void read_player_file() {
+    string line, name;
+    int score, time;
+    int i = 0;
+    int member = 0;
+    fstream player_file("playerfile.txt", fstream::in);
+    while (getline(player_file, line)) {
+        
+        i++;
+        if(i == 1)
+            name = line;
+        if(i == 2) 
+            score = stoi(line);  
+        if(i == 3)
+            time = stoi(line);
+        
+        if(i > 3) { 
+            i = 1;
+            players.push_back(Player());
+            players[member].player_name = name;
+            players[member].highscore = score;
+            players[member].duration = time;
+            member++;
+            name = line;
+        }
+    }
+    player_file.close();
+}
+
+void ranking() {
+    int size = players.size();
+    int arr[size];
+    for(int i = 0; i < size; i++) {
+        arr[i] = players[i].highscore;
+    }
+    cout << endl;
+    sort(arr, arr + size, greater<int>());
+    
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
+            if(players[j].highscore == arr[i]) {
+                sorted_players.push_back(Player());
+                sorted_players[i].player_name = players[j].player_name;
+                sorted_players[i].highscore = arr[i];
+                sorted_players[i].duration = players[j].duration;
+            }  
+        }
+    }
+}
+
+void print_ranking_list() {
+    int size = sorted_players.size();
+    cout << "Name\t" << "Score\t" << "Duration\n";
+    for(int i = 0; i < size; i++) {
+        cout << sorted_players[i].player_name << "\t" << sorted_players[i].highscore << 
+        "\t" << sorted_players[i].duration << endl;
+    }
+    cout << endl;
+    cout << ">return to main menu";
+    while(1) {
+        while(!kbhit()) {}
+        int const ch = getch();
+            if(ch == key_enter) {
+                system("CLS");
+                return main_menu();
+        }
+    }
+}    
+
+
+void record_player_rank() {
+    int playtime;
+    fstream player_file("playerfile.txt", fstream::app);
+
+    playtime = hours * 3600 + minutes * 60 + seconds;
+
+    player_file << name << endl;
+    player_file << score << endl;
+    player_file << playtime << endl;
+    
+    player_file.close();
+}
+
+void title() {
     cout <<
     "#######        #           #######     ###     ###          #         ##      #\n" <<
     "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
@@ -84,6 +166,14 @@ void main_menu() {
     "#          # ##### #    #              #         #      # ##### #     #    #  #\n" <<
     "#         #         #     #            #         #     #         #    #     # #\n" <<
     "#        #           #     #######     #         #    #           #   #      ##\n";
+}
+
+void main_menu() {
+    int x, y;
+    x = 40;
+    y = 8;
+    CursorPosition(0, 0);
+    title();
     CursorPosition(x, y);
     cout << "start" << endl;
     cout << endl;
@@ -91,6 +181,9 @@ void main_menu() {
     cout << "map editor" << endl;
     cout << endl;
     CursorPosition(x, y + 4);
+    cout << "leaderboard" << endl;
+    cout << endl;
+    CursorPosition(x, y + 6);
     cout << "quit";
     while(1) {
         CursorPosition(x - 1, y);
@@ -106,15 +199,19 @@ void main_menu() {
                 }
                 break;
             case key_down:
-                if (y + 2 < 13) {
-                    CursorPosition(x - 1, y);
-                    cout << ' ';
+                if (y + 2 < 15) {
+                    delete_old_position(x - 1, y);
                     y += 2;
                 }
                 break;
             case key_enter:
                 switch(y) {
                     case 8:
+                        system("CLS");
+                        title();
+                        CursorPosition(x, y);
+                        cout << "Name: ";
+                        cin >> name;
                         choose_map("Please select a map: ");
                         break;
                     case 10:
@@ -122,6 +219,12 @@ void main_menu() {
                         map_screen();
                         break;
                     case 12:
+                        system("CLS");
+                        read_player_file();
+                        ranking();
+                        print_ranking_list();
+                        break;
+                    case 14:
                         exit(0);
                         break;
                 }
@@ -180,14 +283,7 @@ void map_screen() {
     int y = 8;
     string command;
 
-    cout <<
-    "#######        #           #######     ###     ###          #         ##      #\n" <<
-    "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
-    "#      #     #   #      #              #   # #   #        #   #       #  #    #\n" <<
-    "######      #     #     #              #    #    #       #     #      #   #   #\n" <<
-    "#          # ##### #    #              #         #      # ##### #     #    #  #\n" <<
-    "#         #         #     #            #         #     #         #    #     # #\n" <<
-    "#        #           #     #######     #         #    #           #   #      ##\n";
+    title();
 
     CursorPosition(x, y);
     cout << "new map" << endl << endl;
