@@ -47,7 +47,9 @@ int main() {
         check_game_condition();
         Sleep(100);
         i++;
-    }  
+    } 
+    record_player_rank(); 
+
     switch(pacman.status) {
         case lose:
             system("CLS");

@@ -3,6 +3,8 @@
     'X' is player
 */
 #pragma once
+#include <string>
+#include <vector>
 enum GAMESTATE {
     running = 0,
     win, lose
@@ -35,3 +37,14 @@ bool start = false;
 int score = 0;
 int totalDots = 0;
 int map_num, hours, minutes, seconds;
+
+struct Player{
+    std::string player_name;
+    int highscore;
+    int duration;
+};
+
+std::vector<Player> players;
+std::vector<Player> sorted_players;
+
+std::string name;

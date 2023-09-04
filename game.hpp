@@ -3,7 +3,10 @@
 #include <windows.h>
 #include <cmath>
 #include <chrono>
-#include <iomanip>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <algorithm>
 #include "global.hpp"
 #include "map.hpp"
 
@@ -55,10 +58,79 @@ void check_game_condition() {
         pacman.status = GAMESTATE::win;
 }
 
-void cover() {
-    int x, y;
-    x = 40;
-    y = 8;
+void read_player_file() {
+    string line, name;
+    int score, time;
+    int i = 0;
+    int member = 0;
+    fstream player_file("playerfile.txt", fstream::in);
+    while (getline(player_file, line)) {
+        
+        i++;
+        if(i == 1)
+            name = line;
+        if(i == 2) 
+            score = stoi(line);  
+        if(i == 3)
+            time = stoi(line);
+        
+        if(i > 3) { 
+            i = 1;
+            players.push_back(Player());
+            players[member].player_name = name;
+            players[member].highscore = score;
+            players[member].duration = time;
+            member++;
+            name = line;
+        }
+    }
+    player_file.close();
+}
+
+void ranking() {
+    int size = players.size();
+    int arr[size];
+    for(int i = 0; i < size; i++) {
+        arr[i] = players[i].highscore;
+    }
+    cout << endl;
+    sort(arr, arr + size, greater<int>());
+    
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
+            if(players[j].highscore == arr[i]) {
+                sorted_players.push_back(Player());
+                sorted_players[i].player_name = players[j].player_name;
+                sorted_players[i].highscore = arr[i];
+                sorted_players[i].duration = players[j].duration;
+            }  
+        }
+    }
+}
+
+void print_ranking_list() {
+    int size = sorted_players.size();
+    cout << "Name\t" << "Score\t" << "Duration\n";
+    for(int i = 0; i < size; i++) {
+        cout << sorted_players[i].player_name << "\t" << sorted_players[i].highscore << 
+        "\t" << sorted_players[i].duration << endl;
+    }
+}
+
+void record_player_rank() {
+    int playtime;
+    fstream player_file("playerfile.txt", fstream::app);
+
+    playtime = hours * 3600 + minutes * 60 + seconds;
+
+    player_file << name << endl;
+    player_file << score << endl;
+    player_file << playtime << endl;
+    
+    player_file.close();
+}
+
+void print_title() {
     cout <<
     "#######        #           #######     ###     ###          #         #       #\n" <<
     "#      #      # #         #            #  #   #  #         # #        # #     #\n" <<
@@ -67,14 +139,23 @@ void cover() {
     "#          # ##### #     #             #         #      # ##### #     #    #  #\n" <<
     "#         #         #     #            #         #     #         #    #     # #\n" <<
     "#        #           #     #######     #         #    #           #   #       #\n";
+}
+
+void cover() {
+    int x, y;
+    x = 40;
+    y = 8;
+    print_title();
     CursorPosition(x, y);
     cout << "start\n";
     cout << endl;
     CursorPosition(x, y + 2);
+    cout << "leaderboard";
+    CursorPosition(x, y + 4);
     cout << "quit";
     while(1) {
 
-        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 11) {
+        if(GetAsyncKeyState(VK_DOWN) & 0x1 && y + 2 < 13) {
             delete_old_position(x - 1, y);
             y = y + 2;
         }
@@ -88,8 +169,21 @@ void cover() {
             switch(y) {
                 case 8:
                     system("CLS");
+                    print_title();
+                    cout << "\n";
+                    cout << "Name: ";
+                    cin >> name;
+                    system("CLS");
                     break;
                 case 10:
+                    system("CLS");
+                    read_player_file();
+                    ranking();
+                    print_ranking_list();
+                    system("pause");
+                    exit(0);
+                    break;
+                case 12:
                     exit(0);
                     break;
             }
@@ -100,6 +194,7 @@ void cover() {
 
 void check_map() {
     int x, y;
+    int i = 0;
     x = 0;
     y = 1;
     cout << "Pls choose the map:\n";
@@ -135,7 +230,9 @@ void check_map() {
         CursorPosition(0, 6);
         cout << endl;
         PreviewMap();
-        if(GetAsyncKeyState(VK_RETURN)) {
+        if(GetAsyncKeyState(VK_RETURN))
+            i++;
+        if(GetAsyncKeyState(VK_RETURN) && i >= 2) {
             switch(y) {
                 case 1:
                     map_num = 1;
