@@ -38,19 +38,25 @@ void CursorPosition(short x, short y) {
 } 
 
 void delete_old_position(short x, short y) {
-        CursorPosition(x, y);
-        cout << " ";
+    CursorPosition(x, y);
+    cout << ' ';
+    CursorPosition(x + 1, y);
+    cout << ' ';
+    CursorPosition(x, y + 1);
+    cout << ' ';
+    CursorPosition(x + 1, y + 1);
+    cout << ' ';
 }
 
 bool check_obstacles(short x, short y) {
-    return map[y][x] == '#' || map[y][x] == '|';
+    return map[y][x] == (char)MAP::Wall;
 }
 
 void InitializeTotalDots() {
     // Count the initial number of dots
-    for (int row = 0; row < 40; row++) {
-        for (int column = 0; column < 80; column++) {
-            if (map[row][column] == '.') 
+    for (int row = 0; row < 40; row += 2) {
+        for (int column = 0; column < 80; column += 2) {
+            if (map[row][column] == (char)MAP::Dot)
                 totalDots++;
         }
     }
@@ -73,25 +79,26 @@ void read_player_file() {
     int score, time;
     int i = 0;
     int member = 0;
-    fstream player_file("playerfile.txt", fstream::in);
+    fstream player_file(pacman_folder + "\\" + "playerfile.txt", fstream::in);
     while (getline(player_file, line)) {
-        
         i++;
         if(i == 1)
             name = line;
         if(i == 2) 
             score = stoi(line);  
-        if(i == 3)
+        if(i == 3) {
             time = stoi(line);
-        
-        if(i > 3) { 
-            i = 1;
+
+            // By this time, we have collected all information
+            // of the particular player.
+            // Save them and reset `i`
             players.push_back(Player());
             players[member].player_name = name;
             players[member].highscore = score;
             players[member].duration = time;
+
             member++;
-            name = line;
+            i = 0;
         }
     }
     player_file.close();
@@ -135,12 +142,12 @@ void print_ranking_list() {
                 return main_menu();
         }
     }
-}    
+}
 
 
 void record_player_rank() {
     int playtime;
-    fstream player_file("playerfile.txt", fstream::app);
+    fstream player_file(pacman_folder + "\\" + "playerfile.txt", fstream::app);
 
     playtime = hours * 3600 + minutes * 60 + seconds;
 
@@ -187,13 +194,15 @@ void main_menu() {
         switch(ch) {
             case key_up:
                 if (y - 2 > 7) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < 15) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -252,13 +261,15 @@ void choose_map(string message) {
         switch(ch) {
             case key_up:
                 if (y - 2 > 0) {
-                    delete_old_position(x, y);
+                    CursorPosition(x, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < max_list) {
-                    delete_old_position(x, y);
+                    CursorPosition(x, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -291,13 +302,15 @@ void map_screen() {
         switch(ch) {
             case key_up:
                 if (y - 2 > 7) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y -= 2;
                 }
                 break;
             case key_down:
                 if (y + 2 < 13) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -324,7 +337,7 @@ void map_screen() {
                             // Copy existing map to new file (input)
                             if (tolower(use_template) == 'y') {
                                 choose_map("Choose a map as template: ");
-                                CopyFile((map_path + "\\" + map_choice).c_str(), (map_path + "\\" + res + ".map").c_str(), true);
+                                CopyFile((pacman_folder + "\\" + map_choice).c_str(), (pacman_folder + "\\" + res + ".map").c_str(), true);
                             }
 
                             // Start notepad and wait for user to close it
@@ -351,9 +364,9 @@ void map_screen() {
     }
 }
 
-void count_time(auto start) {
+void count_time() {
 	auto finish = std::chrono::steady_clock::now();
-    auto diff = finish - start;
+    auto diff = finish - time_start;
     auto playtime = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
 
     hours = playtime / 3600;

@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <cmath>
 #include <chrono>
+
 #include "global.hpp"
 #include "game.hpp"
 
@@ -10,7 +11,7 @@ using namespace std;
 
 /*
              b
-             ^ 
+             ^
         a <     > c
              v
              d
@@ -24,101 +25,101 @@ void next_enemy_position() {
     switch(enemy_previous_state) {
         case Upward:
             // Move Upward
-            if(!check_obstacles(enemy.x, enemy.y - 1)) {
+            if(!check_obstacles(enemy.x, enemy.y - 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y - 1);
+                result_y = player.y - (enemy.y - 2);
                 distance_b = sqrt(result_x * result_x + result_y * result_y);
             }
             // Move left
-            if(!check_obstacles(enemy.x - 1, enemy.y)) {
-                result_x = player.x - (enemy.x - 1);
+            if(!check_obstacles(enemy.x - 2, enemy.y)) {
+                result_x = player.x - (enemy.x - 2);
                 result_y = player.y - enemy.y;
                 distance_a = sqrt(result_x * result_x + result_y * result_y);
             }
             // Move right
-            if(!check_obstacles(enemy.x + 1, enemy.y)) {
-                result_x = player.x - (enemy.x + 1);
+            if(!check_obstacles(enemy.x + 2, enemy.y)) {
+                result_x = player.x - (enemy.x + 2);
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
             break;
         case Downward:
             // Move Downward
-            if(!check_obstacles(enemy.x, enemy.y + 1)) {
+            if(!check_obstacles(enemy.x, enemy.y + 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y + 1);
+                result_y = player.y - (enemy.y + 2);
                 distance_d = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x - 1, enemy.y)) {
-                result_x = player.x - (enemy.x - 1);
+            if(!check_obstacles(enemy.x - 2, enemy.y)) {
+                result_x = player.x - (enemy.x - 2);
                 result_y = player.y - enemy.y;
                 distance_a = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x + 1, enemy.y)) {
-                result_x = player.x - (enemy.x + 1);
+            if(!check_obstacles(enemy.x + 2, enemy.y)) {
+                result_x = player.x - (enemy.x + 2);
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
             break;
         case Left:
-            if(!check_obstacles(enemy.x, enemy.y - 1)) {
+            if(!check_obstacles(enemy.x, enemy.y - 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y - 1);
+                result_y = player.y - (enemy.y - 2);
                 distance_b = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x, enemy.y + 1)) {
+            if(!check_obstacles(enemy.x, enemy.y + 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y + 1);
+                result_y = player.y - (enemy.y + 2);
                 distance_d = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x - 1, enemy.y)) {
-                result_x = player.x - (enemy.x - 1);
+            if(!check_obstacles(enemy.x - 2, enemy.y)) {
+                result_x = player.x - (enemy.x - 2);
                 result_y = player.y - enemy.y;
                 distance_a = sqrt(result_x * result_x + result_y * result_y);
             }
             break;
         case Right:
-            if(!check_obstacles(enemy.x, enemy.y - 1)) {
+            if(!check_obstacles(enemy.x, enemy.y - 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y - 1);
+                result_y = player.y - (enemy.y - 2);
                 distance_b = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x, enemy.y + 1)) {
+            if(!check_obstacles(enemy.x, enemy.y + 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y + 1);
+                result_y = player.y - (enemy.y + 2);
                 distance_d = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x + 1, enemy.y)) {
-                result_x = player.x - (enemy.x + 1);
+            if(!check_obstacles(enemy.x + 2, enemy.y)) {
+                result_x = player.x - (enemy.x + 2);
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
         case Still:
-            if(!check_obstacles(enemy.x, enemy.y - 1)) {
+            if(!check_obstacles(enemy.x, enemy.y - 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y - 1);
+                result_y = player.y - (enemy.y - 2);
                 distance_b = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x, enemy.y + 1)) {
+            if(!check_obstacles(enemy.x, enemy.y + 2)) {
                 result_x = player.x - enemy.x;
-                result_y = player.y - (enemy.y + 1);
+                result_y = player.y - (enemy.y + 2);
                 distance_d = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x + 1, enemy.y)) {
-                result_x = player.x - (enemy.x + 1);
+            if(!check_obstacles(enemy.x + 2, enemy.y)) {
+                result_x = player.x - (enemy.x + 2);
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
-            if(!check_obstacles(enemy.x - 1, enemy.y)) {
-                result_x = player.x - (enemy.x - 1);
+            if(!check_obstacles(enemy.x - 2, enemy.y)) {
+                result_x = player.x - (enemy.x - 2);
                 result_y = player.y - enemy.y;
                 distance_a = sqrt(result_x * result_x + result_y * result_y);
             }
     }
 }
- 
+
 void check_enemy_state() {
-    float smallest_num[] = {distance_a, distance_b, distance_c, distance_d};    
+    float smallest_num[] = {distance_a, distance_b, distance_c, distance_d};   
     for(int i = 1; i < 4; i++) {
         if(smallest_num[0] > smallest_num[i])
             smallest_num[0] = smallest_num[i];
@@ -170,36 +171,48 @@ void check_reset_enemy() {
                 enemy_previous_state = DIRECTION::Still;
             }
             break;
-            
+
     }
 }
 
 void draw_enemy_position() {
     enemy_previous_state = enemy_state;
-    if(map[enemy.y][enemy.x] == '.') {
-        CursorPosition(enemy.x, enemy.y); 
-        cout << '.';
+    if(map[enemy.y][enemy.x] == (char)MAP::Dot) {
+        CursorPosition(enemy.x, enemy.y);
+        cout << (char)MAP::Dot;
+        CursorPosition(enemy.x + 1, enemy.y);
+        cout << (char)MAP::Dot;
+        CursorPosition(enemy.x, enemy.y + 1);
+        cout << (char)MAP::Dot;
+        CursorPosition(enemy.x + 1, enemy.y + 1);
+        cout << (char)MAP::Dot;
     }
     else
         delete_old_position(enemy.x, enemy.y);
     switch(enemy_state) {
         case Upward:
-            CursorPosition(enemy.x, enemy.y - 1);
-            enemy.y--;
+            CursorPosition(enemy.x, enemy.y - 2);
+            enemy.y -= 2;
             break;
         case Downward:
-            CursorPosition(enemy.x, enemy.y + 1);
-            enemy.y++;
+            CursorPosition(enemy.x, enemy.y + 2);
+            enemy.y += 2;
             break;
         case Left:
-            CursorPosition(enemy.x - 1, enemy.y);
-            enemy.x--;
+            CursorPosition(enemy.x - 2, enemy.y);
+            enemy.x -= 2;
             break;
         case Right:
-            CursorPosition(enemy.x + 1, enemy.y);
-            enemy.x++;
+            CursorPosition(enemy.x + 2, enemy.y);
+            enemy.x += 2;
             break;
     }
-    cout << "E";
-    
+    CursorPosition(enemy.x, enemy.y);
+    cout << (char)250u;
+    CursorPosition(enemy.x + 1, enemy.y);
+    cout << (char)250u;
+    CursorPosition(enemy.x, enemy.y + 1);
+    cout << (char)205u;
+    CursorPosition(enemy.x + 1, enemy.y + 1);
+    cout << (char)205u;
 }

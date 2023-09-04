@@ -4,7 +4,9 @@
 */
 #pragma once
 #include <string>
+#include <chrono>
 #include <vector>
+
 enum GAMESTATE {
     running = 0,
     win, lose
@@ -14,6 +16,13 @@ enum DIRECTION {
     Still = 0,
     Upward, Downward, Left, Right
 }state, enemy_state, enemy_previous_state;
+
+// Reference: https://www.ascii-code.com/CP437
+enum MAP {
+    Dot = 176u, // Middle dot
+    Enemy = 239u, // Intersection
+    Wall = 219u, // Full block
+};
 
 /*
     To access the member of struct
@@ -49,3 +58,7 @@ std::vector<Player> sorted_players;
 
 std::string name;
 std::string map_choice;
+std::chrono::time_point<std::chrono::steady_clock> time_start;
+
+std::string appdata = getenv("APPDATA");
+std::string pacman_folder = appdata + "\\pacman_game";
