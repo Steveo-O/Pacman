@@ -59,3 +59,6 @@ std::vector<Player> sorted_players;
 std::string name;
 std::string map_choice;
 std::chrono::time_point<std::chrono::steady_clock> time_start;
+
+std::string appdata = getenv("APPDATA");
+std::string pacman_folder = appdata + "\\pacman_game";

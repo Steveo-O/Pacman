@@ -76,16 +76,13 @@ char default3[20][40] = {
         "+#####################################+"};
 
 char map[40][80];
-char* appdata = getenv("APPDATA");
-string map_folder = "\\pacman_game";
-string map_path = appdata + map_folder;
 string search_pattern = "\\*.map";
-string search_path = map_path + search_pattern;
+string search_path = pacman_folder + search_pattern;
 
 void load_default_map() {
-    fstream fout1(map_path + "//" + "default1.map", fstream::out);
-    fstream fout2(map_path + "//" + "default2.map", fstream::out);
-    fstream fout3(map_path + "//" + "default3.map", fstream::out);
+    fstream fout1(pacman_folder + "//" + "default1.map", fstream::out);
+    fstream fout2(pacman_folder + "//" + "default2.map", fstream::out);
+    fstream fout3(pacman_folder + "//" + "default3.map", fstream::out);
 
     for (auto line: default1) {
         fout1 << line << endl;
@@ -104,7 +101,7 @@ void load_default_map() {
 
 vector<string> find_all_maps() {
     // Create directory if necessary
-    if (CreateDirectory(map_path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
+    if (CreateDirectory(pacman_folder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
         vector<string> maps;
         WIN32_FIND_DATA fd;
 
@@ -132,7 +129,7 @@ vector<string> find_all_maps() {
 
 void InitMap() {
     char ch;
-    fstream fin(map_path + "//" + map_choice, fstream::in);
+    fstream fin(pacman_folder + "\\" + map_choice, fstream::in);
     int row = 0;
     int col = 0;
     while(fin >> noskipws >> ch) {
@@ -207,7 +204,7 @@ void InitMap() {
 void PreviewMap() 
 {
     string line;
-    fstream fin(map_path + "//" + map_choice, fstream::in);
+    fstream fin(pacman_folder + "//" + map_choice, fstream::in);
     while(getline(fin, line)) {
         cout << line << endl;
     }
@@ -215,5 +212,5 @@ void PreviewMap()
 }
 
 string editor_command(string map_name) {
-     return "notepad \"" + map_path + "\\" + map_name + "\"";
+     return "notepad \"" + pacman_folder + "\\" + map_name + "\"";
 }

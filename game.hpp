@@ -79,25 +79,26 @@ void read_player_file() {
     int score, time;
     int i = 0;
     int member = 0;
-    fstream player_file("playerfile.txt", fstream::in);
+    fstream player_file(pacman_folder + "\\" + "playerfile.txt", fstream::in);
     while (getline(player_file, line)) {
-        
         i++;
         if(i == 1)
             name = line;
         if(i == 2) 
             score = stoi(line);  
-        if(i == 3)
+        if(i == 3) {
             time = stoi(line);
-        
-        if(i > 3) { 
-            i = 1;
+
+            // By this time, we have collected all information
+            // of the particular player.
+            // Save them and reset `i`
             players.push_back(Player());
             players[member].player_name = name;
             players[member].highscore = score;
             players[member].duration = time;
+
             member++;
-            name = line;
+            i = 0;
         }
     }
     player_file.close();
@@ -141,12 +142,12 @@ void print_ranking_list() {
                 return main_menu();
         }
     }
-}    
+}
 
 
 void record_player_rank() {
     int playtime;
-    fstream player_file("playerfile.txt", fstream::app);
+    fstream player_file(pacman_folder + "\\" + "playerfile.txt", fstream::app);
 
     playtime = hours * 3600 + minutes * 60 + seconds;
 
@@ -200,7 +201,8 @@ void main_menu() {
                 break;
             case key_down:
                 if (y + 2 < 15) {
-                    delete_old_position(x - 1, y);
+                    CursorPosition(x - 1, y);
+                    cout << ' ';
                     y += 2;
                 }
                 break;
@@ -335,7 +337,7 @@ void map_screen() {
                             // Copy existing map to new file (input)
                             if (tolower(use_template) == 'y') {
                                 choose_map("Choose a map as template: ");
-                                CopyFile((map_path + "\\" + map_choice).c_str(), (map_path + "\\" + res + ".map").c_str(), true);
+                                CopyFile((pacman_folder + "\\" + map_choice).c_str(), (pacman_folder + "\\" + res + ".map").c_str(), true);
                             }
 
                             // Start notepad and wait for user to close it
