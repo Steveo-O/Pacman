@@ -178,7 +178,12 @@ print_ranking_list()
             max_duration_len = to_string(player.duration).length();
         }
     }
-    // Add one more length for whitespace
+    /* Add one more length for whitespace
+     *
+     * Magic number :tada:
+     *  - 6 -> the length of table header `Score` + whitespace
+     *  - 9 -> the length of table header `Duration` + whitespace
+     */
     max_name_len++;
     max_score_len = max_score_len < 6 ? 6 : max_score_len + 1;
     max_duration_len = max_score_len < 9 ? 9 : max_score_len;
@@ -199,9 +204,22 @@ print_ranking_list()
      * For x axis, the coordinate is determined by finding the remaining spaces
      * after occupying the longest data in a row.
      * Similarly, y coordinate is obtained by subtracting the total length of list
+     *
+     * Magic number:
+     *  - 4: the table header and the return to main menu button
      */
     int x = (SCREEN_WIDTH - max_name_len - max_score_len - max_duration_len) / 2;
-    int y = (SCREEN_HEIGHT - size - 1) / 2;
+    int y = (SCREEN_HEIGHT - size - 4) / 2;
+
+    /*
+     * Limit the amount of entries displayed to fit into the screen
+     * Magic number? This is just trial and error (:
+     */
+    if (size > SCREEN_HEIGHT - 3) {
+        size = SCREEN_HEIGHT - 5;
+        y = 1;
+    }
+
 
     /*
      * To compute how much space to insert between table header,
