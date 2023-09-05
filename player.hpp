@@ -11,21 +11,32 @@ using namespace std;
     Set the player direction state 
 */ 
 void check_direction() {
-    if(GetAsyncKeyState(VK_UP) & 0x1) {
-        state = DIRECTION::Upward;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_DOWN) & 0x1) {
-        state = DIRECTION::Downward;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_LEFT) & 0x1) {
-        state = DIRECTION::Left;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_RIGHT) & 0x1) {
-        state = DIRECTION::Right;
-        start = true;
+    const int key_up = 72;
+    const int key_down = 80;
+    const int key_left = 75;
+    const int key_right = 77;
+
+    if (kbhit()) {
+        int const ch = getch();
+        switch(ch) {
+            case key_up:
+                state = DIRECTION::Upward;
+                start = true;
+                break;
+            case key_down:
+                state = DIRECTION::Downward;
+                start = true;
+                break;
+            case key_left:
+                state = DIRECTION::Left;
+                start = true;
+                break;
+            case key_right:
+                state = DIRECTION::Right;
+                start = true;
+                break;
+        }
+
     }
 }
 
