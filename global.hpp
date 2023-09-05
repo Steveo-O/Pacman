@@ -1,64 +1,99 @@
-/*
-    '$' && '|' are wall
-    'X' is player
-*/
 #pragma once
-#include <string>
 #include <chrono>
+#include <string>
 #include <vector>
 
-enum GAMESTATE {
-    running = 0,
-    win, lose
+#include <windows.h>
+
+#define SCREEN_WIDTH 100
+#define SCREEN_HEIGHT 40
+
+enum Gamestate {
+    Running = 0,
+    Win,
+    Lose,
 };
 
-enum DIRECTION {
+enum Direction {
     Still = 0,
-    Upward, Downward, Left, Right
-}state, enemy_state, enemy_previous_state;
-
-// Reference: https://www.ascii-code.com/CP437
-enum MAP {
-    Dot = 176u, // Middle dot
-    Enemy = 239u, // Intersection
-    Wall = 219u, // Full block
+    Upward,
+    Downward,
+    Left,
+    Right,
 };
 
 /*
-    To access the member of struct
-    Use "."
-    Example: player.x
-*/
-struct POSITION{
+ * Reference: https://www.ascii-code.com/CP437
+ */
+enum Map {
+    Dot = 176u, // middle dot
+    Wall = 219u, // full block
+};
+
+struct Position {
     short x;
     short y;
     short old_x;
     short old_y;
-}player, enemy;
-struct PACMAN{
-    GAMESTATE status;
-    int score, max_score;
-}pacman;
+};
 
-float distance_a, distance_b, distance_c, distance_d;
-float result_x, result_y;
-bool start = false;
-int score = 0;
-int totalDots = 0;
-int map_num, hours, minutes, seconds;
+struct Pacman {
+    // Console related data
+    HANDLE hConsole;
 
-struct Player{
+    Gamestate status;
+    bool start = false;
+    std::string map_choice;
+
+    // Track score
+    int max_score;
+    int score;
+
+    // Track game time
+    std::chrono::time_point<std::chrono::steady_clock> time_start;
+    int hours, minutes, seconds;
+};
+
+struct Player {
     std::string player_name;
     int highscore;
     int duration;
 };
 
-std::vector<Player> players;
-std::vector<Player> sorted_players;
+/*
+ * Global game state
+ */
+Pacman pacman;
 
-std::string name;
-std::string map_choice;
-std::chrono::time_point<std::chrono::steady_clock> time_start;
+/*
+ * Player's state
+ */
+Position player;
+Direction player_state;
 
+/*
+ * Enemy's state
+ */
+Position enemy;
+Direction enemy_state, enemy_previous_state;
+
+/*
+ * data storage path
+ * All data that needs to be stored are
+ * located at `%APPDATA%\pacman_game`
+ *
+ * This location is at:
+ * C:\Users\<username>\AppData\Roaming\pacman_game\
+ */
 std::string appdata = getenv("APPDATA");
 std::string pacman_folder = appdata + "\\pacman_game";
+
+
+/*
+ * shorthand for keycodes
+ */
+const int key_up = 72;
+const int key_down = 80;
+const int key_left = 75;
+const int key_right = 77;
+const int key_enter = 13;
