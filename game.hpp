@@ -339,7 +339,7 @@ void map_screen() {
                                 choose_map("Choose a map as template: ");
                                 CopyFile((pacman_folder + "\\" + map_choice).c_str(), (pacman_folder + "\\" + res + ".map").c_str(), true);
                             }
-
+                            cout << "!! IMPORTANT include 'X' as the player and 'E' as the enemy in the map";
                             // Start notepad and wait for user to close it
                             command = editor_command(res + ".map");
                             system(command.c_str());
@@ -349,7 +349,7 @@ void map_screen() {
                         }
                     case 10:
                         choose_map("Choose a map to be edited: ");
-
+                        cout << "!! IMPORTANT include 'X' as the player and 'E' as the enemy in the map";
                         // Start notepad and wait for user to close it
                         command = editor_command(map_choice);
                         system(command.c_str());
