@@ -1,23 +1,37 @@
 #pragma once
-#include <iostream>
-#include <windows.h>
+
 #include <cmath>
-#include <chrono>
+#include <iostream>
+
+#include <windows.h>
+
+void check_enemy_state();
+void check_reset_enemy();
+void draw_enemy_position();
+void next_enemy_position();
 
 #include "global.hpp"
 #include "game.hpp"
+#include "map.hpp"
 
 using namespace std;
 
 /*
              b
              ^
-        a <     > c
+         a<     >c
              v
              d
 */
+float distance_a, distance_b, distance_c, distance_d;
+float result_x, result_y;
 
-void next_enemy_position() {
+/*
+ * NOTE: move direction in 2 unit as expanded grid is 2x2
+ */
+void
+next_enemy_position()
+{
     distance_a = 1000;
     distance_b = 1000;
     distance_c = 1000;
@@ -94,6 +108,7 @@ void next_enemy_position() {
                 result_y = player.y - enemy.y;
                 distance_c = sqrt(result_x * result_x + result_y * result_y);
             }
+            break;
         case Still:
             if(!check_obstacles(enemy.x, enemy.y - 2)) {
                 result_x = player.x - enemy.x;
@@ -118,7 +133,9 @@ void next_enemy_position() {
     }
 }
 
-void check_enemy_state() {
+void
+check_enemy_state()
+{
     float smallest_num[] = {distance_a, distance_b, distance_c, distance_d};   
     for(int i = 1; i < 4; i++) {
         if(smallest_num[0] > smallest_num[i])
@@ -126,20 +143,22 @@ void check_enemy_state() {
     }
 
     if(smallest_num[0] == distance_a) {
-        enemy_state = DIRECTION::Left;
+        enemy_state = Direction::Left;
     }
     if(smallest_num[0] == distance_b) {
-        enemy_state = DIRECTION::Upward;
+        enemy_state = Direction::Upward;
     }
     if(smallest_num[0] == distance_c) {
-        enemy_state = DIRECTION::Right;
+        enemy_state = Direction::Right;
     }
     if(smallest_num[0] == distance_d) {
-        enemy_state = DIRECTION::Downward;
+        enemy_state = Direction::Downward;
     }
 }
 
-void check_reset_enemy() {
+void
+check_reset_enemy()
+{
     int distance_x, distance_y, time;
     distance_x = player.x - enemy.x;
     distance_y = player.y - enemy.y;
@@ -151,68 +170,79 @@ void check_reset_enemy() {
 
     time = chrono::duration_cast <chrono::seconds> (diff).count();
     switch(enemy_state) {
-        case(Left):
+        case Left:
             if(distance_x > 0 && time == 2) {
-                enemy_previous_state = DIRECTION::Still;
+                enemy_previous_state = Direction::Still;
             }
             break;
-        case(Right):
+        case Right:
             if(distance_x < 0 && time == 2) {
-                enemy_previous_state = DIRECTION::Still;
+                enemy_previous_state = Direction::Still;
             }
             break;
-        case(Upward):
+        case Upward:
             if(distance_y > 0 && time == 2) {
-                enemy_previous_state = DIRECTION::Still;
+                enemy_previous_state = Direction::Still;
             }
             break;
-        case(Downward):
+        case Downward:
             if(distance_y < 0 && time == 2) {
-                enemy_previous_state = DIRECTION::Still;
+                enemy_previous_state = Direction::Still;
             }
             break;
-
+        case Still:
+            break;
     }
 }
 
-void draw_enemy_position() {
+void
+draw_enemy_position()
+{
     enemy_previous_state = enemy_state;
-    if(map[enemy.y][enemy.x] == (char)MAP::Dot) {
-        CursorPosition(enemy.x, enemy.y);
-        cout << (char)MAP::Dot;
-        CursorPosition(enemy.x + 1, enemy.y);
-        cout << (char)MAP::Dot;
-        CursorPosition(enemy.x, enemy.y + 1);
-        cout << (char)MAP::Dot;
-        CursorPosition(enemy.x + 1, enemy.y + 1);
-        cout << (char)MAP::Dot;
+    if(map[enemy.y][enemy.x] == (char)Map::Dot) {
+        cursor_position(enemy.x, enemy.y);
+        cout << (char)Map::Dot;
+        cursor_position(enemy.x + 1, enemy.y);
+        cout << (char)Map::Dot;
+        cursor_position(enemy.x, enemy.y + 1);
+        cout << (char)Map::Dot;
+        cursor_position(enemy.x + 1, enemy.y + 1);
+        cout << (char)Map::Dot;
     }
     else
         delete_old_position(enemy.x, enemy.y);
     switch(enemy_state) {
         case Upward:
-            CursorPosition(enemy.x, enemy.y - 2);
+            cursor_position(enemy.x, enemy.y - 2);
             enemy.y -= 2;
             break;
         case Downward:
-            CursorPosition(enemy.x, enemy.y + 2);
+            cursor_position(enemy.x, enemy.y + 2);
             enemy.y += 2;
             break;
         case Left:
-            CursorPosition(enemy.x - 2, enemy.y);
+            cursor_position(enemy.x - 2, enemy.y);
             enemy.x -= 2;
             break;
         case Right:
-            CursorPosition(enemy.x + 2, enemy.y);
+            cursor_position(enemy.x + 2, enemy.y);
             enemy.x += 2;
             break;
+        case Still:
+            break;
     }
-    CursorPosition(enemy.x, enemy.y);
+
+    /*
+     * This is the enemy appearance
+     *        ··
+     *        ══
+     */
+    cursor_position(enemy.x, enemy.y);
     cout << (char)250u;
-    CursorPosition(enemy.x + 1, enemy.y);
+    cursor_position(enemy.x + 1, enemy.y);
     cout << (char)250u;
-    CursorPosition(enemy.x, enemy.y + 1);
+    cursor_position(enemy.x, enemy.y + 1);
     cout << (char)205u;
-    CursorPosition(enemy.x + 1, enemy.y + 1);
+    cursor_position(enemy.x + 1, enemy.y + 1);
     cout << (char)205u;
 }
