@@ -31,7 +31,6 @@ int main() {
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
 
     while(1) {
-        main_menu();
         /*
         * Because we are rendering the player cursor (<,>,^,v) in 4 grids,
         * to make it looks same as the symbol in one grid we have to:
@@ -42,14 +41,15 @@ int main() {
         CONSOLE_FONT_INFOEX cfi;
         cfi.cbSize = sizeof(cfi);
         cfi.nFont = 0;
-        cfi.dwFontSize.X = 12;
-        cfi.dwFontSize.Y = 12;
+        cfi.dwFontSize.X = 10;
+        cfi.dwFontSize.Y = 16;
         cfi.FontFamily = FF_DONTCARE;
         cfi.FontWeight = FW_NORMAL;
         wcscpy_s(cfi.FaceName, L"Lucida Console");
         SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), false, &cfi);
-        CursorPosition(20, 20);
+        main_menu();
         
+        CursorPosition(20, 20);
         cout << "Press any key to start"<< endl;
         while(!kbhit()) {}
 
