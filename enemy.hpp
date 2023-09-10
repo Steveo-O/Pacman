@@ -107,6 +107,26 @@ void next_enemy_position() {
             }
             break;
         case Still:
+            if(!check_obstacles(enemy.x, enemy.y - 2)) {
+                result_x = player.x - enemy.x;
+                result_y = player.y - (enemy.y - 2);
+                distance_b = sqrt(result_x * result_x + result_y * result_y);
+            }
+            if(!check_obstacles(enemy.x, enemy.y + 2)) {
+                result_x = player.x - enemy.x;
+                result_y = player.y - (enemy.y + 2);
+                distance_d = sqrt(result_x * result_x + result_y * result_y);
+            }
+            if(!check_obstacles(enemy.x + 2, enemy.y)) {
+                result_x = player.x - (enemy.x + 2);
+                result_y = player.y - enemy.y;
+                distance_c = sqrt(result_x * result_x + result_y * result_y);
+            }
+            if(!check_obstacles(enemy.x - 2, enemy.y)) {
+                result_x = player.x - (enemy.x - 2);
+                result_y = player.y - enemy.y;
+                distance_a = sqrt(result_x * result_x + result_y * result_y);
+            }
             break;
     }
 }   

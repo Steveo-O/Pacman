@@ -60,7 +60,7 @@ int main() {
         InitializeTotalDots();
         
         player_state = DIRECTION::Still;
-        enemy_previous_state = DIRECTION::Upward; // Initiliaze enemy direction 
+        enemy_previous_state = DIRECTION::Still; 
         pacman.status = GAMESTATE::running;
         pacman.start = false;
         pacman.score = 0;
