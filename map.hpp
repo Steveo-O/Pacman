@@ -32,57 +32,89 @@ char default1[20][40] = {
         "+#####################################+"};
 
 char default2[20][40] = {
-        "+#####################################+",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|     #####       #        #####      |",
-        "|                 #                   |",
-        "|                ###                  |",
-        "|           #############             |",
-        "|                ###                  |",
-        "|                 #                   |",
-        "|                 #                   |",
-        "|     #####                #####      |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "|         #                #          |",
-        "+#####################################+"};
+        "+#####################################+",			
+        "|     |            E            |     |",
+        "|   | |     #  #### ####   #    | |   |",
+        "|                 # #                 |",
+        "|     || | |      # #      | | ||     |",
+        "|               ### ###               |",
+        "|   | |           # #           | |   |",
+        "|     |  #   ###### ######   #  |     |",
+        "|  #     |         X         |     #  |",
+        "|   #    |   ###### ######   |   #    |",
+        "|                 # #                 |",
+        "|  #  ###    #### # # ####   ###  #   |",
+        "|    #    #   #   # #   #  #    #     |",
+        "|  #              # #               # |",
+        "|      | | |   |          |   | | |   |",
+        "|  # |       | | |  ##  | | |       | |",
+        "|      | | |   |          |   | | |   |",
+        "|                                     |",
+        "|    #   #   #  # # # # #   #   #     |",
+        "+#####################################+",};
 
 char default3[20][40] = {
-        "+#####################################+",
-        "|             ###########             |",
-        "| # ####### #           # # ####### # |",
-        "| #       # # ######### # #       # # |",
-        "| # #       #             # #       # |",
-        "| # ####### # ########### # ####### # |",
-        "| #         #             #         # |",
-        "|              #### ####            # |",
-        "|  # ####### #     X      # ###### ## |",
-        "| #    #   # #  |     | #    #     ## |",
-        "| #  #   #   #  |#####| #  #   #   ## |",
-        "|  # ####### #            # ###### ## |",
-        "|     #   #    #### ####    #   #     |",
-        "| #     #   #      E      #   #     # |",
-        "| # ####### # ########### # ####### # |",
-        "| # #       #             # #       # |",
-        "| #       # # ######### # #       # # |",
-        "| # ####### #           # # ####### # |",
-        "|             ###########             |",
-        "+#####################################+"};
+        "+#####################################+",			
+        "|     # # # #     #     # # # #       |",
+        "|     #                       #    #  |",
+        "|  #    |     #   #   #     |      #  |",
+        "|     #   |               |   #       |",
+        "|  ###      |     #     |        ###  |",
+        "|         #   |       |    #          |",
+        "|  #            |   |              #  |",
+        "|     #   #   # | X |  #   #   #      |",
+        "|  #            |   |              #  |",
+        "|         #   |       |    #          |",
+        "|     #     |     #     |      #      |",
+        "|         |               |           |",
+        "|  #    |     #   #   #     |      #  |",
+        "|    #     #      E      #       #    |",
+        "|  #              #                #  |",
+        "|      #####   #######    #####       |",
+        "|    #      #     #     #        #    |",
+        "|        #                  #         |",
+        "+#####################################+",};
+
+char empty_map[20][40] = {
+        "+#####################################+",			
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                 E                   |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                 X                   |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "|                                     |",
+        "+#####################################+",};
 
 char map[40][80];
 string search_pattern = "\\*.map";
 string search_path = pacman_folder + search_pattern;
 
+void load_default_map();
+vector<string> find_all_maps();
+void InitMap();
+void PreviewMap();
+string editor_command(string map_name);
+
+/*
+ * Write all default map to `pacman_folder`
+ */
 void load_default_map() {
     fstream fout1(pacman_folder + "//" + "default1.map", fstream::out);
     fstream fout2(pacman_folder + "//" + "default2.map", fstream::out);
     fstream fout3(pacman_folder + "//" + "default3.map", fstream::out);
+    fstream fout4(pacman_folder + "//" + "empty_map.map", fstream::out);
 
     for (auto line: default1) {
         fout1 << line << endl;
@@ -93,12 +125,22 @@ void load_default_map() {
     for (auto line: default3) {
         fout3 << line << endl;
     }
+    for (auto line: empty_map) {
+        fout4 << line << endl;
+    }
 
     fout1.close();
     fout2.close();
     fout3.close();
+    fout4.close();
 }
 
+/*
+ * Find all maps located in `pacman_folder` path.
+ * 1. We create the folder if it is missing (CreateDirectory)
+ * 2. We try to find all files that matches with `.map` file extension recursively
+ * 3. If there's no map found, load the default maps
+ */
 vector<string> find_all_maps() {
     // Create directory if necessary
     if (CreateDirectory(pacman_folder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
@@ -127,6 +169,11 @@ vector<string> find_all_maps() {
     exit(1); // TODO: handle the error nicely
 }
 
+/*
+ * Load map according to the user choice and print them out
+ * Here we expand the map before displaying them
+ *
+ */
 void InitMap() {
     char ch;
     fstream fin(pacman_folder + "\\" + map_choice, fstream::in);
@@ -174,15 +221,15 @@ void InitMap() {
             (horizontal, vertical and diagonal) with the `ch`.
         */
         if (ch == 'X') {
-            map[y][x] = (char)218u;
-            map[y][x + 1] = (char)191u;
-            map[y + 1][x] = (char)192u;
-            map[y + 1][x + 1] = (char)217u;
+            map[y][x] = '\\';
+            map[y][x + 1] = '/';
+            map[y + 1][x] = '/';
+            map[y + 1][x + 1] = '\\';
         } else if (ch == 'E') {
-            map[y][x] = (char)250u;
-            map[y][x + 1] = (char)250u;
-            map[y + 1][x] = (char)205u;
-            map[y + 1][x + 1] = (char)205u;
+            map[y][x] = '^';
+            map[y][x + 1] = '^';
+            map[y + 1][x] = '=';
+            map[y + 1][x + 1] = '=';
         } else {
             map[y][x] = ch;
             map[y + 1][x + 1] = ch;
@@ -192,6 +239,7 @@ void InitMap() {
 
         col += 1;
     }
+    // Print the map
     for(int y = 0; y < 40; y++) 
     {
         for(int x = 0; x < 80 ; x++) {
@@ -211,6 +259,9 @@ void PreviewMap()
     cout << endl;
 }
 
+/*
+ * A helper to construct the command to open notepad for editing the map
+ */
 string editor_command(string map_name) {
      return "notepad \"" + pacman_folder + "\\" + map_name + "\"";
 }

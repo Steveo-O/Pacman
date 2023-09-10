@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cstdio>
 #include <windows.h>
 #include <cmath>
 #include <chrono>
@@ -12,17 +13,27 @@
 
 using namespace std;
 
+std::vector<Player> players;
+std::vector<Player> sorted_players;
+
+void CursorPosition(short x, short y);
+void delete_old_position(short x, short y);
+bool check_obstacles(short x, short y);
+void InitializeTotalDots();
+void check_game_condition();
+void read_player_file();
+void reset_default();
+void ranking();
+void print_ranking_list();
+void record_player_rank();
+void title();
+void validate_map(string map_choice);
 void choose_map(string);
 void main_menu();
 void map_screen();
+void count_time();
 
-const int key_up = 72;
-const int key_down = 80;
-const int key_left = 75;
-const int key_right = 77;
-const int key_enter = 13;
-
-// Move the Cursor to the given position
+// Move the Cursor to the position (x, y)
 void CursorPosition(short x, short y) {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);  
     COORD position = {(short)x, (short)y};  
@@ -48,6 +59,11 @@ void delete_old_position(short x, short y) {
     cout << ' ';
 }
 
+/*
+ * Check if the position (x, y) is a wall
+ * Note that it should receive
+ * the coordinate of the top left corner grid
+ */
 bool check_obstacles(short x, short y) {
     return map[y][x] == (char)MAP::Wall;
 }
@@ -57,20 +73,18 @@ void InitializeTotalDots() {
     for (int row = 0; row < 40; row += 2) {
         for (int column = 0; column < 80; column += 2) {
             if (map[row][column] == (char)MAP::Dot)
-                totalDots++;
+                pacman.max_score++;
         }
     }
 }
 
 void check_game_condition() { 
-    int distance, distance_x, distance_y;
-    distance_x = player.x - enemy.x;
-    distance_y = player.y - enemy.y;
-    distance = sqrt(distance_x * distance_x + distance_y * distance_y);
+    int distance_x = player.x - enemy.x;
+    int distance_y = player.y - enemy.y;
 
-    if(distance == 0) 
+    if(distance_x == 0 && distance_y == 0)
         pacman.status = GAMESTATE::lose;
-    else if(score >= totalDots)
+    else if(pacman.score == pacman.max_score)
         pacman.status = GAMESTATE::win;
 }
 
@@ -80,6 +94,8 @@ void read_player_file() {
     int i = 0;
     int member = 0;
     fstream player_file(pacman_folder + "\\" + "playerfile.txt", fstream::in);
+
+    players.clear();
     while (getline(player_file, line)) {
         i++;
         if(i == 1)
@@ -104,6 +120,21 @@ void read_player_file() {
     player_file.close();
 }
 
+void reset_default() {
+    fstream player_file;
+    player_file.open(pacman_folder + "\\" + "playerfile.txt", fstream::out | fstream::trunc);
+    player_file.close();
+    sorted_players.clear();
+    players.clear();
+    
+    for (string map: find_all_maps()) {
+        string fp = pacman_folder + "\\" + map;
+        remove(fp.c_str());  
+    }
+    system("CLS");
+    main_menu();
+}
+
 void ranking() {
     int size = players.size();
     int arr[size];
@@ -111,6 +142,7 @@ void ranking() {
         arr[i] = players[i].highscore;
     }
     cout << endl;
+    sorted_players.clear();
     sort(arr, arr + size, greater<int>());
     
     for(int i = 0; i < size; i++) {
@@ -152,7 +184,7 @@ void record_player_rank() {
     playtime = hours * 3600 + minutes * 60 + seconds;
 
     player_file << name << endl;
-    player_file << score << endl;
+    player_file << pacman.score << endl;
     player_file << playtime << endl;
     
     player_file.close();
@@ -170,9 +202,8 @@ void title() {
 }
 
 void main_menu() {
-    int x, y;
-    x = 40;
-    y = 8;
+    int x = 40;
+    int y = 8;
     CursorPosition(0, 0);
     title();
     CursorPosition(x, y);
@@ -186,6 +217,9 @@ void main_menu() {
     cout << endl;
     CursorPosition(x, y + 6);
     cout << "quit";
+    cout << endl;
+    CursorPosition(x, y + 8);
+    cout << "reset to default";
     while(1) {
         CursorPosition(x - 1, y);
         cout << ">";
@@ -200,7 +234,7 @@ void main_menu() {
                 }
                 break;
             case key_down:
-                if (y + 2 < 15) {
+                if (y + 2 < 17) {
                     CursorPosition(x - 1, y);
                     cout << ' ';
                     y += 2;
@@ -213,7 +247,14 @@ void main_menu() {
                         title();
                         CursorPosition(x, y);
                         cout << "Name: ";
-                        cin >> name;
+                        // store name with whitespaces
+                        // and avoid empty input
+                        while(getline(cin, name)) {
+                            if (name != "") {
+                                break;
+                            }
+                            CursorPosition(x + 6, y);
+                        }
                         choose_map("Please select a map: ");
                         break;
                     case 10:
@@ -228,6 +269,9 @@ void main_menu() {
                         break;
                     case 14:
                         exit(0);
+                        break;
+                    case 16:
+                        reset_default();
                         break;
                 }
                 return;
@@ -280,11 +324,37 @@ void choose_map(string message) {
     }
 }
 
+void validate_map(string map_choice) {
+    string command;
+    
+    while(1) {
+        
+        // Start notepad and wait for user to close it
+        command = editor_command(map_choice);
+        system(command.c_str());
+
+        fstream check_map_file(pacman_folder + "\\" + map_choice, fstream::in);
+        char ch;
+        int is_X_exist = 0;
+        int is_E_exist = 0;
+        while(check_map_file >> ch) {
+            if(ch == 'X')
+                is_X_exist++;
+            if(ch == 'E')
+                is_E_exist++;
+        }
+        if(is_X_exist == 1 && is_E_exist == 1)
+            break;
+        else {
+            system("CLS");
+            cout << "Pls include a 'X' and a 'E' in the map";
+        }
+    }
+}
+
 void map_screen() {
     int x = 40;
     int y = 8;
-    string command;
-
     title();
 
     CursorPosition(x, y);
@@ -324,10 +394,9 @@ void map_screen() {
                                 CursorPosition(x, y + 14);
                                 cout << "Use existing maps as template? [y/n]";
                                 use_template = _getch();
-                                if (tolower(use_template) != 'y' && tolower(use_template) != 'n') {
-                                    continue;
+                                if (tolower(use_template) == 'y' || tolower(use_template) == 'n') {
+                                    break;
                                 }
-                                break;
                             }
                             cout << endl;
                             CursorPosition(x, y + 15);
@@ -339,20 +408,18 @@ void map_screen() {
                                 choose_map("Choose a map as template: ");
                                 CopyFile((pacman_folder + "\\" + map_choice).c_str(), (pacman_folder + "\\" + res + ".map").c_str(), true);
                             }
-                            cout << "!! IMPORTANT include 'X' as the player and 'E' as the enemy in the map";
-                            // Start notepad and wait for user to close it
-                            command = editor_command(res + ".map");
-                            system(command.c_str());
-
+                            else
+                                CopyFile((pacman_folder + "\\" + "empty_map.map").c_str(), (pacman_folder + "\\" + res + ".map").c_str(), true);
+                            validate_map(res + ".map");
+                            system("CLS");
                             main_menu();
                             break;
                         }
+                    
                     case 10:
                         choose_map("Choose a map to be edited: ");
-                        cout << "!! IMPORTANT include 'X' as the player and 'E' as the enemy in the map";
-                        // Start notepad and wait for user to close it
-                        command = editor_command(map_choice);
-                        system(command.c_str());
+                        validate_map(map_choice);
+                        system("CLS");
                         main_menu();
                         break;
                     case 12:

@@ -6,38 +6,50 @@
 
 using namespace std;
 
+void check_direction();
+void check_consume_dot(short x, short y);
+void draw_player_position();
+bool next_position();
+
 /*
     Check which key is pressed
     Set the player direction state 
 */ 
-void check_direction() {
-    if(GetAsyncKeyState(VK_UP) & 0x1) {
-        state = DIRECTION::Upward;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_DOWN) & 0x1) {
-        state = DIRECTION::Downward;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_LEFT) & 0x1) {
-        state = DIRECTION::Left;
-        start = true;
-    }
-    else if(GetAsyncKeyState(VK_RIGHT) & 0x1) {
-        state = DIRECTION::Right;
-        start = true;
+void check_direction()
+{
+    if (kbhit()) {
+        int const ch = getch();
+        switch(ch) {
+            case key_up:
+                player_state = DIRECTION::Upward;
+                pacman.start = true;
+                break;
+            case key_down:
+                player_state = DIRECTION::Downward;
+                pacman.start = true;
+                break;
+            case key_left:
+                player_state = DIRECTION::Left;
+                pacman.start = true;
+                break;
+            case key_right:
+                player_state = DIRECTION::Right;
+                pacman.start = true;
+                break;
+        }
+
     }
 }
 
 void check_consume_dot(short x, short y) {
     if(map[y][x] == (char)MAP::Dot) {
         map[y][x] = ' ';
-        score++;  // Increment the score
+        pacman.score++;  // Increment the score
     }
 }
 
 void draw_player_position() {
-    switch(state) {
+    switch(player_state) {
         case Upward:
             CursorPosition(player.x, player.y);
             cout << '/';
@@ -84,37 +96,39 @@ void draw_player_position() {
     check_consume_dot(player.x, player.y);
 }
 
-// From the given direction state, change the player position according to the direction state
+/* From the given direction state,
+ * change the player position according to the direction state
+ *
+ * NOTE: the reason for moving 2 unit instead of 1 is the map grid is 2x2
+ */
 bool next_position() {
-    switch(state) {
+    switch(player_state) {
         case Upward:
             if (!check_obstacles(player.x, player.y - 2)){
                 delete_old_position(player.x, player.y);
                 player.y -= 2;
-                return true;
             }
             break;
         case Downward:
             if (!check_obstacles(player.x, player.y + 2)){
                 delete_old_position(player.x, player.y);
                 player.y += 2;
-                return true;
             }
             break;
         case Left:
             if (!check_obstacles(player.x - 2, player.y)){
                 delete_old_position(player.x, player.y);
                 player.x -= 2;
-                return true;
             }
             break;
         case Right:
             if (!check_obstacles(player.x + 2, player.y)){
                 delete_old_position(player.x, player.y);
                 player.x += 2;
-                return true;
             }
             break;
+        case Still:
+            return false;
     }
-    return false;
+    return true;
 }

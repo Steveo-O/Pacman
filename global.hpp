@@ -1,7 +1,3 @@
-/*
-    '$' && '|' are wall
-    'X' is player
-*/
 #pragma once
 #include <string>
 #include <chrono>
@@ -9,42 +5,33 @@
 
 enum GAMESTATE {
     running = 0,
-    win, lose
+    win,
+    lose,
 };
 
 enum DIRECTION {
     Still = 0,
-    Upward, Downward, Left, Right
-}state, enemy_state, enemy_previous_state;
-
-// Reference: https://www.ascii-code.com/CP437
-enum MAP {
-    Dot = 176u, // Middle dot
-    Enemy = 239u, // Intersection
-    Wall = 219u, // Full block
+    Upward, 
+    Downward, 
+    Left, 
+    Right
 };
 
-/*
-    To access the member of struct
-    Use "."
-    Example: player.x
-*/
+enum MAP {
+    Dot = '.',
+    Wall = '#'
+};
+
 struct POSITION{
     short x;
     short y;
-    short old_x;
-    short old_y;
-}player, enemy;
+};
 struct PACMAN{
     GAMESTATE status;
     int score, max_score;
+    bool start = false;
 }pacman;
 
-float distance_a, distance_b, distance_c, distance_d;
-float result_x, result_y;
-bool start = false;
-int score = 0;
-int totalDots = 0;
 int map_num, hours, minutes, seconds;
 
 struct Player{
@@ -53,12 +40,38 @@ struct Player{
     int duration;
 };
 
-std::vector<Player> players;
-std::vector<Player> sorted_players;
-
 std::string name;
 std::string map_choice;
 std::chrono::time_point<std::chrono::steady_clock> time_start;
 
+/*
+ * Player's state
+ */
+POSITION player;
+DIRECTION player_state;
+
+/*
+ * Enemy's state
+ */
+POSITION enemy;
+DIRECTION enemy_state, enemy_previous_state;
+
+/*
+ * data storage path
+ * All data that needs to be stored are
+ * located at `%APPDATA%\pacman_game`
+ *
+ * This location is at:
+ * C:\Users\<username>\AppData\Roaming\pacman_game\
+ */
 std::string appdata = getenv("APPDATA");
 std::string pacman_folder = appdata + "\\pacman_game";
+
+/*
+ * shorthand for keycodes
+ */
+const int key_up = 72;
+const int key_down = 80;
+const int key_left = 75;
+const int key_right = 77;
+const int key_enter = 13;
