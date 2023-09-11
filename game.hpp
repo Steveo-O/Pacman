@@ -13,8 +13,7 @@
 
 using namespace std;
 
-std::vector<Player> players;
-std::vector<Player> sorted_players;
+vector<Player> players;
 
 void CursorPosition(short x, short y);
 void delete_old_position(short x, short y);
@@ -32,6 +31,9 @@ void choose_map(string);
 void main_menu();
 void map_screen();
 void count_time();
+
+static bool compare_score(Player i, Player j);
+static bool compare_duration(Player i, Player j);
 
 // Move the Cursor to the position (x, y)
 void CursorPosition(short x, short y) {
@@ -135,34 +137,29 @@ void reset_default() {
     main_menu();
 }
 
+static bool compare_score(Player i, Player j) {
+    return (i.highscore > j.highscore);
+}
+
+static bool compare_duration(Player i, Player j) {
+    if (i.highscore == j.highscore) {
+        return (i.duration > j.duration);
+    }
+    return false;
+}
+
 void ranking() {
-    int size = players.size();
-    int arr[size];
-    for(int i = 0; i < size; i++) {
-        arr[i] = players[i].highscore;
-    }
     cout << endl;
-    sorted_players.clear();
-    sort(arr, arr + size, greater<int>());
-    
-    for(int i = 0; i < size; i++) {
-        for(int j = 0; j < size; j++) {
-            if(players[j].highscore == arr[i]) {
-                sorted_players.push_back(Player());
-                sorted_players[i].player_name = players[j].player_name;
-                sorted_players[i].highscore = arr[i];
-                sorted_players[i].duration = players[j].duration;
-            }  
-        }
-    }
+    sort(players.begin(), players.end(), compare_score);
+    sort(players.begin(), players.end(), compare_duration);
 }
 
 void print_ranking_list() {
-    int size = sorted_players.size();
+    int size = players.size();
     cout << "Name\t" << "Score\t" << "Duration\n";
     for(int i = 0; i < size; i++) {
-        cout << sorted_players[i].player_name << "\t" << sorted_players[i].highscore << 
-        "\t" << sorted_players[i].duration << endl;
+        cout << players[i].player_name << "\t" << players[i].highscore << 
+        "\t" << players[i].duration << endl;
     }
     cout << endl;
     cout << ">return to main menu";
